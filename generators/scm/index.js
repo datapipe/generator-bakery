@@ -3,6 +3,8 @@ var yeoman = require('yeoman-generator');
 var chalk = require('chalk');
 var yosay = require('yosay');
 
+const SCM_TOOLS = ['github', 'github-enterprise'];
+
 var ImageBuildCI = yeoman.Base.extend({
 
   constructor: function() {
@@ -13,12 +15,6 @@ var ImageBuildCI = yeoman.Base.extend({
     /** @property {object} answers - prompt answers */
     this.answers = {};
 
-    this.option('scmtool', {
-      desc: 'Specify the SCM Toolset to be used',
-      type: String,
-      alias: 't'
-    });
-
     this.option('projectname', {
       desc: 'Name of the project being created',
       type: String,
@@ -28,14 +24,31 @@ var ImageBuildCI = yeoman.Base.extend({
 
   prompting: function () {
 
-    var prompts = [];
-    
     this.log(yosay(
       '... Configuration Management Details!'
     ));
 
+    var prompts = [
+      {
+        type: "confirm",
+        name: "createscm",
+        message: "Attempt to create Source Control repository?",
+        default: true
+      },
+      {
+        type: "list",
+        name: "scmtool",
+        message: "Source Control Management (SCM) tool:",
+        choices: SCM_TOOLS,
+        when: function(response) {
+          return response.create_scm;
+        }
+      }
+    ];
+
     return this.prompt(prompts).then(function (props) {
-      switch (this.options.scmtool){
+      this.props = props;
+      switch (this.props.scmtool){
         case 'github':
         case 'github-enterprise':
           this.composeWith('github-create:authenticate', {}, {});

@@ -3,6 +3,8 @@ var yeoman = require('yeoman-generator');
 var chalk = require('chalk');
 var yosay = require('yosay');
 
+const CI_TOOLS = ['jenkins', 'drone'];
+
 var ImageBuildCI = yeoman.Base.extend({
 
   constructor: function() {
@@ -13,13 +15,6 @@ var ImageBuildCI = yeoman.Base.extend({
     /** @property {object} answers - prompt answers */
     this.answers = {};
 
-    this.option('citype', {
-      desc: 'Specify the CI Toolset to be used',
-      type: String,
-      alias: 't'
-    });
-
-
     this.option('projectname', {
       desc: 'Name of the project being created',
       type: String,
@@ -29,8 +24,24 @@ var ImageBuildCI = yeoman.Base.extend({
 
   prompting: function () {
     this.log(yosay(
-      '... Configuration Management Details!'
+      '... Continuous Integration Details!'
     ));
+
+    var prompts = [{
+      type: "confirm",
+      name: "createci",
+      message: "Create CI Scripts?",
+      default: true
+    },
+    {
+      type: "list",
+      name: "citool",
+      message: "Continuous Integration (CI) tool:",
+      choices: CI_TOOLS,
+      when: function(response) {
+        return response.create_ci;
+      }
+    }];
 
     return this.prompt(prompts).then(function (props) {
       switch (this.options.citype){
