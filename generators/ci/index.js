@@ -25,7 +25,7 @@ var BakeryCI = yeoman.Base.extend({
 
   prompting: function () {
 
-    this.log(bakery.banner('Source Control'));
+    this.log(bakery.banner('Continuous Integration!'));
 
     var prompts = [{
       type: "confirm",
