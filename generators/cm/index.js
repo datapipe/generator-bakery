@@ -107,12 +107,11 @@ var BakeryCM = yeoman.Base.extend({
   writing: function () {
     var replacements = {
       license: this.props.license,
-      project_name: this.options.projectname,
+      project_name: process.env.PROJECTNAME,
       author_name: this.props.authorname,
       author_email: this.props.authoremail,
       short_description: this.props.shortdescription,
       long_description: this.props.longdescription,
-      license: this.props.license,
       source_url: this.props.sourceurl,
       pronect_url: this.props.projecturl,
       issues_url: this.props.issuesurl
