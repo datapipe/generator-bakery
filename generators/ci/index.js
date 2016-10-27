@@ -24,9 +24,9 @@ var BakeryCI = yeoman.Base.extend({
   },
 
   prompting: function () {
-    this.log(yosay(
-      '... Continuous Integration Details!'
-    ));
+    bakery.banner('Source Control').then((banner) => {
+      console.log(banner);
+    });
 
     var prompts = [{
       type: "confirm",
@@ -46,7 +46,7 @@ var BakeryCI = yeoman.Base.extend({
 
     return this.prompt(prompts).then(function (props) {
       this.props = props;
-      
+
       switch (this.props.citype){
         case 'drone':
           //do something
