@@ -2,7 +2,8 @@
 const yeoman = require('yeoman-generator'),
        chalk = require('chalk'),
        yosay = require('yosay'),
-      bakery = require('../../lib/bakery');
+      bakery = require('../../lib/bakery'),
+      github = require('../../lib/github');
 
 const LICENSES = ['Proprietary - All Rights Reserved', 'Apache v2.0', 'GPL v3', 'MIT', 'ISC'];
 const CM_TOOLS = ['chef', 'puppet', 'bash'];
@@ -22,13 +23,14 @@ var BakeryCM = yeoman.Base.extend({
       type: String,
       alias: 'n'
     });
+
+    var gitUser = github.getGitUser();
+    this.user = gitUser || {};
   },
 
   prompting: function () {
-    this.log(yosay(
-      '... Configuration Management Details!'
-    ));
-
+    this.log(bakery.banner('Configuration Management!'));
+    var userInfo = github.getGitUser() || {};
     var prompts = [
     {
       type: 'list',
@@ -45,12 +47,14 @@ var BakeryCM = yeoman.Base.extend({
     {
       type: 'input',
       name: 'authorname',
-      message: "Enter the author's full name or organization:"
+      message: "Enter the author's full name or organization:",
+      default: userInfo.name
     },
     {
         type: 'input',
         name: 'authoremail',
-        message: "Enter the author or organization's email:"
+        message: "Enter the author or organization's email:",
+        default: userInfo.email
     },
     {
         type: 'input',
@@ -80,12 +84,16 @@ var BakeryCM = yeoman.Base.extend({
           return response.cmtool == 'puppet';
         }
     }
-    ];
+  ];
 
     return this.prompt(prompts).then(function (props) {
       // To access props later use this.props.someAnswer;
       this.props = props;
-      switch (this.props.cmtype){
+
+      // load to global to share with other components easily
+      process.env.CM_TYPE = this.props.cmtool;
+
+      switch (this.props.cmtool){
         case 'puppet':
           break;
         case 'chef':

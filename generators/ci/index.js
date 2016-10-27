@@ -25,7 +25,7 @@ var BakeryCI = yeoman.Base.extend({
 
   prompting: function () {
 
-    this.log(bakery.banner('Source Control'));
+    this.log(bakery.banner('Continuous Integration!'));
 
     var prompts = [{
       type: "confirm",
@@ -39,13 +39,13 @@ var BakeryCI = yeoman.Base.extend({
       message: "Continuous Integration (CI) tool:",
       choices: CI_TOOLS,
       when: function(response) {
-        return response.create_ci;
+        return response.createci;
       }
     }];
 
     return this.prompt(prompts).then(function (props) {
       this.props = props;
-
+      process.env.CI_TYPE = this.props.citool;
       switch (this.props.citool){
         case 'drone':
           //do something

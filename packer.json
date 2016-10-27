@@ -1,0 +1,30 @@
+{
+  "primaryBuilder": {
+    "ami_name": "thisisatest {{timestamp}}",
+    "instance_type": "t2.large",
+    "region": "us-west-2",
+    "source_amp": "ami-12345",
+    "ami_regions": [
+      "us-west-2"
+    ],
+    "ami_description": "this is a short description",
+    "ami_groups": [
+      "234212",
+      "313543232",
+      "2323221"
+    ],
+    "ami_users": [
+      "413121",
+      "331312",
+      "331311"
+    ],
+    "iam_instance_profile": "iam-12335"
+  },
+  "primaryProvisioner": {
+    "type": "chef-solo",
+    "cookbook_paths": [
+      "../"
+    ],
+    "guest_os_type": "unix"
+  }
+}

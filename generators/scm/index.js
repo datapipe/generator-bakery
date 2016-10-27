@@ -2,7 +2,8 @@
 const yeoman = require('yeoman-generator'),
        chalk = require('chalk'),
        yosay = require('yosay'),
-      bakery = require('../../lib/bakery');
+      bakery = require('../../lib/bakery'),
+      github = require('../../lib/github');
 
 const SCM_TOOLS = ['github', 'github-enterprise'];
 
@@ -25,10 +26,7 @@ var BakeryCI = yeoman.Base.extend({
 
   prompting: function () {
 
-    this.log(yosay(
-      '... Configuration Management Details!'
-    ));
-
+    this.log(bakery.banner('Project Setup!'));
     var prompts = [
       {
         type: "confirm",
@@ -42,7 +40,7 @@ var BakeryCI = yeoman.Base.extend({
         message: "Source Control Management (SCM) tool:",
         choices: SCM_TOOLS,
         when: function(response) {
-          return response.create_scm;
+          return response.createscm;
         }
       }
     ];
@@ -52,11 +50,8 @@ var BakeryCI = yeoman.Base.extend({
       switch (this.props.scmtool){
         case 'github':
         case 'github-enterprise':
-          this.composeWith('github-create:authenticate', {}, {});
-          this.composeWith('github-create:create', {
-            options: {
-              name: this.options.projectname
-            }}, {});
+          // need to implement this...
+          this.log('Still need to implement this...');
           break;
         default:
           this.log.error('SCM toolset ' + this.options.scmtool + ' is not currently available. Skipping SCM script setup');
