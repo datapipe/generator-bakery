@@ -1,12 +1,13 @@
 'use strict';
-var yeoman = require('yeoman-generator');
-var chalk = require('chalk');
-var yosay = require('yosay');
+const yeoman = require('yeoman-generator'),
+       chalk = require('chalk'),
+       yosay = require('yosay'),
+      bakery = require('../../lib/bakery');
 
 const LICENSES = ['Proprietary - All Rights Reserved', 'Apache v2.0', 'GPL v3', 'MIT', 'ISC'];
 const CM_TOOLS = ['chef', 'puppet', 'bash'];
 
-module.exports = yeoman.Base.extend({
+var BakeryCM = yeoman.Base.extend({
 
   constructor: function() {
     yeoman.Base.apply(this, arguments);
@@ -114,3 +115,5 @@ module.exports = yeoman.Base.extend({
     this.installDependencies();
   }
 });
+
+module.exports = BakeryCM;

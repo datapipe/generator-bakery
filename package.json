@@ -1,8 +1,8 @@
 {
-  "name": "generator-imagebuild",
-  "version": "0.0.0",
+  "name": "generator-bakery",
+  "version": "0.1.0",
   "description": "AWS Image Repo generator for building consistent AMI's",
-  "homepage": "https://github.com/datapipe/generator-imagebuild",
+  "homepage": "https://github.com/datapipe/generator-bakery",
   "author": {
     "name": "Patrick McClory",
     "email": "pmcclory@datapipe.com",
@@ -12,8 +12,7 @@
     "generators"
   ],
   "main": "generators/index.js",
-  "keywords": [
-    "",
+  "keywords":[
     "yeoman-generator"
   ],
   "dependencies": {
@@ -41,7 +40,7 @@
       "mocha": true
     }
   },
-  "repository": "patrickmcclory/generator-imagebuild",
+  "repository": "datapipe/generator-bakery",
   "scripts": {
     "prepublish": "gulp prepublish",
     "test": "gulp"
