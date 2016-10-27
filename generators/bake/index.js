@@ -1,12 +1,13 @@
 'use strict';
-var yeoman = require('yeoman-generator');
-var chalk = require('chalk');
-var yosay = require('yosay');
+const yeoman = require('yeoman-generator'),
+       chalk = require('chalk'),
+       yosay = require('yosay'),
+      bakery = require('../../lib/bakery');
 
 const AWS_REGIONS = [{name: 'us-east-1'}, {name: 'us-east-2'}, {name: 'us-west-1'}, {name: 'us-west-2'}, {name: 'ap-south-1'}, {name: 'ap-northeast-1'}, {name: 'ap-southeast-1'}, {name: 'ap-southeast-2'}, {name: 'ap-northeast-1'}, {name: 'eu-central-1'}, {name: 'eu-west-1'}, {name: 'sa-east-1'}];
 const AWS_INSTANCE_TYPES = ['t2.nano', 't2.micro', 't2.small', 't2.medium', 't2.large', 'm4.large', 'm4.xlarge', 'm4.2xlarge', 'm4.4xlarge', 'm4.8xlarge', 'm4.16xlarge', 'c4.large', 'c4.xlarge', 'c4.2xlarge', 'c4.4xlarge', 'c4.8xlarge'];
 
-var ImageBuildCI = yeoman.Base.extend({
+var BakeryBake = yeoman.Base.extend({
 
   constructor: function() {
     yeoman.Base.apply(this, arguments);
@@ -114,4 +115,4 @@ var ImageBuildCI = yeoman.Base.extend({
   }
 });
 
-module.exports = ImageBuildCI;
+module.exports = BakeryBake;

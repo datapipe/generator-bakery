@@ -1,11 +1,12 @@
 'use strict';
-var yeoman = require('yeoman-generator');
-var chalk = require('chalk');
-var yosay = require('yosay');
+const yeoman = require('yeoman-generator'),
+       chalk = require('chalk'),
+       yosay = require('yosay'),
+      bakery = require('../../lib/bakery');
 
 const SCM_TOOLS = ['github', 'github-enterprise'];
 
-var ImageBuildCI = yeoman.Base.extend({
+var BakeryCI = yeoman.Base.extend({
 
   constructor: function() {
     yeoman.Base.apply(this, arguments);
@@ -71,4 +72,4 @@ var ImageBuildCI = yeoman.Base.extend({
   }
 });
 
-module.exports = ImageBuildCI;
+module.exports = BakeryCI;

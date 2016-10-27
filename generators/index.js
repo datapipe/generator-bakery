@@ -1,15 +1,16 @@
 'use strict';
-var yeoman = require('yeoman-generator');
-var chalk = require('chalk');
-var yosay = require('yosay');
+const yeoman = require('yeoman-generator'),
+       chalk = require('chalk'),
+       yosay = require('yosay'),
+       bakery = require('../lib/bakery');
 
 const CM_TOOLS = ['chef', 'puppet', 'bash'];
 
-var ImageBuildGenerator = yeoman.Base.extend({
+var BakeryGenerator = yeoman.Base.extend({
   prompting: function () {
     // Have Yeoman greet the user.
     this.log(yosay(
-      'Welcome to the super-excellent ' + chalk.red('generator-imagebuild') + ' generator!'
+      'Welcome to the super-excellent ' + chalk.red('bakery') + ' generator!'
     ));
 
     var prompts = [
@@ -53,4 +54,4 @@ var ImageBuildGenerator = yeoman.Base.extend({
   }
 });
 
-module.exports = ImageBuildGenerator;
+module.exports = BakeryGenerator;

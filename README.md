@@ -1,19 +1,19 @@
-# generator-imagebuild [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
+# generator-bakery [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url]
 > AWS Image Repo generator for building consistent AMI&#39;s
 
 ## Installation
 
-First, install [Yeoman](http://yeoman.io) and generator-imagebuild using [npm](https://www.npmjs.com/) (we assume you have pre-installed [node.js](https://nodejs.org/)).
+First, install [Yeoman](http://yeoman.io) and generator-bakery using [npm](https://www.npmjs.com/) (we assume you have pre-installed [node.js](https://nodejs.org/)).
 
 ```bash
 npm install -g yo
-npm install -g generator-imagebuild
+npm install -g generator-bakery
 ```
 
 Then generate your new project:
 
 ```bash
-yo imagebuild
+yo bakery
 ```
 
 ## Getting To Know Yeoman
@@ -25,7 +25,7 @@ yo imagebuild
 
 ## License
 
-ISC © [Patrick McClory](https://datapipe.com/)
+ISC © [Datapipe](https://datapipe.com/)
 
 
 [npm-image]: https://badge.fury.io/js/generator-imagebuild.svg
