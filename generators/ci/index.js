@@ -24,9 +24,8 @@ var BakeryCI = yeoman.Base.extend({
   },
 
   prompting: function () {
-    bakery.banner('Source Control').then((banner) => {
-      console.log(banner);
-    });
+
+    this.log(bakery.banner('Source Control'));
 
     var prompts = [{
       type: "confirm",
@@ -47,7 +46,7 @@ var BakeryCI = yeoman.Base.extend({
     return this.prompt(prompts).then(function (props) {
       this.props = props;
 
-      switch (this.props.citype){
+      switch (this.props.citool){
         case 'drone':
           //do something
           break;
@@ -55,7 +54,7 @@ var BakeryCI = yeoman.Base.extend({
           //do something
           break;
         default:
-          this.log.error('CI toolset ' + this.options.citype + ' is not currently available. Skipping CI script setup');
+          this.log.error('CI toolset ' + this.options.citool + ' is not currently available. Skipping CI script setup');
           break;}
     }.bind(this));
   },

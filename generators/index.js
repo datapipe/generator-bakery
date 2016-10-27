@@ -23,22 +23,22 @@ var BakeryGenerator = yeoman.Base.extend({
     return this.prompt(prompts).then(function (props) {
       this.props = props;
 
-      this.composeWith('imagebuild:scm', {
+      this.composeWith('bakery:scm', {
         options: {
           projectname: this.props.projectname
         }}, {});
 
-      this.composeWith('imagebuild:cm', {
+      this.composeWith('bakery:cm', {
         options: {
           projectname: this.props.projectname
         }}, {});
 
-      this.composeWith('imagebuild:bake', {
+      this.composeWith('bakery:bake', {
         options: {
           projectname: this.props.projectname
         }}, {}) ;
 
-      this.composeWith('imagebuild:ci', {
+      this.composeWith('bakery:ci', {
       options: {
         projectname: this.props.projectname
       }}, {})
