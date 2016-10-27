@@ -32,9 +32,7 @@ var BakeryBake = yeoman.Base.extend({
   },
 
   prompting: function () {
-    this.log(yosay(
-      '... Continuous Integration Details!'
-    ));
+    this.log(bakery.banner('Bakery Setup!'));
 
     var prompts = [{
       type: "confirm",

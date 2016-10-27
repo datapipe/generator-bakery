@@ -25,9 +25,7 @@ var BakeryCM = yeoman.Base.extend({
   },
 
   prompting: function () {
-    this.log(yosay(
-      '... Configuration Management Details!'
-    ));
+    this.log(bakery.banner('Configuration Management!'));
 
     var prompts = [
     {
