@@ -1,8 +1,11 @@
 'use strict';
 const yeoman = require('yeoman-generator'),
-    chalk = require('chalk'),
-    yosay = require('yosay'),
-    bakery = require('../../lib/bakery');
+       chalk = require('chalk'),
+       yosay = require('yosay'),
+      bakery = require('../../lib/bakery'),
+    feedback = require('../../lib/feedback'),
+       debug = require('debug')('bakery:lib:github'),
+           _ = require('lodash');
 
 const AWS_REGIONS = [{
     name: 'us-east-1'

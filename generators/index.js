@@ -2,7 +2,10 @@
 const yeoman = require('yeoman-generator'),
        chalk = require('chalk'),
        yosay = require('yosay'),
-       bakery = require('../lib/bakery');
+      bakery = require('../lib/bakery'),
+    feedback = require('../../lib/feedback'),
+       debug = require('debug')('bakery:lib:github'),
+           _ = require('lodash');
 
 const CM_TOOLS = ['chef', 'puppet', 'bash'];
 

@@ -3,7 +3,10 @@ const yeoman = require('yeoman-generator'),
        chalk = require('chalk'),
        yosay = require('yosay'),
       bakery = require('../../lib/bakery'),
-      github = require('../../lib/github');
+      github = require('../../lib/github'),,
+    feedback = require('../../lib/feedback'),
+       debug = require('debug')('bakery:lib:github'),
+           _ = require('lodash');
 
 const SCM_TOOLS = ['github', 'github-enterprise'];
 
@@ -27,7 +30,7 @@ var BakeryCI = yeoman.Base.extend({
   prompting: function () {
 
     this.log(bakery.banner('Project Setup!'));
-    
+
     var prompts = [
       {
         type: "confirm",
