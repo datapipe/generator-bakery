@@ -16,6 +16,14 @@ Then generate your new project:
 yo bakery
 ```
 
+## Chef Users
+
+* Check out the Packer provisioner details for [chef-solo](https://www.packer.io/docs/provisioners/chef-solo.html) if you want to extend the process provided out of the box.
+
+## Puppet Users
+
+* Check out the Packer provisioner details for [puppet-masterless](https://www.packer.io/docs/provisioners/puppet-masterless.html) if you want to extend the process provided out of the box.
+
 ## Getting To Know Yeoman
 
  * Yeoman has a heart of gold.

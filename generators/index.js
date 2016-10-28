@@ -22,6 +22,7 @@ var BakeryGenerator = yeoman.Base.extend({
 
     return this.prompt(prompts).then(function (props) {
       this.props = props;
+      process.env.PROJECTNAME = this.props.projectname;
 
       this.composeWith('bakery:scm', {
         options: {
@@ -33,15 +34,15 @@ var BakeryGenerator = yeoman.Base.extend({
           projectname: this.props.projectname
         }}, {});
 
+      this.composeWith('bakery:ci', {
+      options: {
+        projectname: this.props.projectname
+      }}, {});
+
       this.composeWith('bakery:bake', {
         options: {
           projectname: this.props.projectname
         }}, {}) ;
-
-      this.composeWith('bakery:ci', {
-      options: {
-        projectname: this.props.projectname
-      }}, {})
     }.bind(this));
   },
 
