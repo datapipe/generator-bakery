@@ -27,6 +27,7 @@ var BakeryCI = yeoman.Base.extend({
   prompting: function () {
 
     this.log(bakery.banner('Project Setup!'));
+    
     var prompts = [
       {
         type: "confirm",

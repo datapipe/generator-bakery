@@ -118,6 +118,10 @@ var BakeryCM = yeoman.Base.extend({
     }
   },
 
+  _chefRepoBase: function(replacementVariables) {
+
+  },
+
   install: function () {
     this.installDependencies();
   }
