@@ -3,7 +3,7 @@ const yeoman = require('yeoman-generator'),
        chalk = require('chalk'),
        yosay = require('yosay'),
       bakery = require('../lib/bakery'),
-    feedback = require('../../lib/feedback'),
+    feedback = require('../lib/feedback'),
        debug = require('debug')('bakery:lib:github'),
            _ = require('lodash');
 
