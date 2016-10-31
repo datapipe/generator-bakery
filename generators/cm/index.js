@@ -3,7 +3,10 @@ const yeoman = require('yeoman-generator'),
        chalk = require('chalk'),
        yosay = require('yosay'),
       bakery = require('../../lib/bakery'),
-      github = require('../../lib/github');
+      github = require('../../lib/github'),
+    feedback = require('../../lib/feedback'),
+       debug = require('debug')('bakery:lib:github'),
+           _ = require('lodash');
 
 const LICENSES = ['Proprietary - All Rights Reserved', 'Apache v2.0', 'GPL v3', 'MIT', 'ISC'];
 const CM_TOOLS = ['chef', 'puppet', 'bash'];
