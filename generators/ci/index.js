@@ -4,7 +4,7 @@ const yeoman = require('yeoman-generator'),
   yosay = require('yosay'),
   bakery = require('../../lib/bakery'),
   feedback = require('../../lib/feedback'),
-  debug = require('debug')('bakery:lib:github'),
+  debug = require('debug')('bakery:generators:ci:index'),
   _ = require('lodash');
 
 const CI_TOOLS = ['jenkins', 'drone'];
@@ -62,7 +62,25 @@ var BakeryCI = yeoman.Base.extend({
   },
 
   writing: function() {
-
+    var file = "";
+    switch (this.env.CI_TYPE) {
+      case 'drone':
+        file = ".drone.yml";
+        break;
+      case 'jenkins':
+        file = "Jenkinsfile.xml";
+        break;
+      default:
+        this.log.error('CI toolset ' + this.env.CI_TYPE + ' is not currently available. Skipping CI script setup.');
+        break;
+    };
+    if (file != "") {
+      this.fs.copyTpl(
+        this.templatePath(file),
+        this.destinationPath(file),
+        replacements
+      );
+    }
   },
 
   install: function() {

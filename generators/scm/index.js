@@ -5,7 +5,7 @@ const yeoman = require('yeoman-generator'),
   bakery = require('../../lib/bakery'),
   github = require('../../lib/github'),
   feedback = require('../../lib/feedback'),
-  debug = require('debug')('bakery:lib:github'),
+  debug = require('debug')('bakery:generators:scm:index'),
   _ = require('lodash');
 
 const SCM_TOOLS = ['github', 'github-enterprise'];
