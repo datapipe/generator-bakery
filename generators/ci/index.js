@@ -4,7 +4,7 @@ const yeoman = require('yeoman-generator'),
   yosay = require('yosay'),
   bakery = require('../../lib/bakery'),
   feedback = require('../../lib/feedback'),
-  debug = require('debug')('bakery:lib:github'),
+  debug = require('debug')('bakery:generators:ci:index'),
   _ = require('lodash');
 
 const CI_TOOLS = ['jenkins', 'drone'];
