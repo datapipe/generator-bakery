@@ -1,12 +1,12 @@
 'use strict';
 const yeoman = require('yeoman-generator'),
-       chalk = require('chalk'),
-       yosay = require('yosay'),
-      bakery = require('../../lib/bakery'),
-      github = require('../../lib/github'),
-    feedback = require('../../lib/feedback'),
-       debug = require('debug')('bakery:lib:github'),
-           _ = require('lodash');
+  chalk = require('chalk'),
+  yosay = require('yosay'),
+  bakery = require('../../lib/bakery'),
+  github = require('../../lib/github'),
+  feedback = require('../../lib/feedback'),
+  debug = require('debug')('bakery:lib:github'),
+  _ = require('lodash');
 
 const SCM_TOOLS = ['github', 'github-enterprise'];
 
@@ -19,39 +19,34 @@ var BakeryCI = yeoman.Base.extend({
 
     /** @property {object} answers - prompt answers */
     this.answers = {};
-
-    this.option('projectname', {
-      desc: 'Name of the project being created',
+    this.argument('projectname', {
       type: String,
-      alias: 'n'
+      required: true
     });
   },
 
-  prompting: function () {
+  prompting: function() {
 
     this.log(bakery.banner('Project Setup!'));
 
-    var prompts = [
-      {
-        type: "confirm",
-        name: "createscm",
-        message: "Attempt to create Source Control repository?",
-        default: true
-      },
-      {
-        type: "list",
-        name: "scmtool",
-        message: "Source Control Management (SCM) tool:",
-        choices: SCM_TOOLS,
-        when: function(response) {
-          return response.createscm;
-        }
+    var prompts = [{
+      type: "confirm",
+      name: "createscm",
+      message: "Attempt to create Source Control repository?",
+      default: true
+    }, {
+      type: "list",
+      name: "scmtool",
+      message: "Source Control Management (SCM) tool:",
+      choices: SCM_TOOLS,
+      when: function(response) {
+        return response.createscm;
       }
-    ];
+    }];
 
-    return this.prompt(prompts).then(function (props) {
+    return this.prompt(prompts).then(function(props) {
       this.props = props;
-      switch (this.props.scmtool){
+      switch (this.props.scmtool) {
         case 'github':
         case 'github-enterprise':
           // need to implement this...
@@ -59,14 +54,14 @@ var BakeryCI = yeoman.Base.extend({
           break;
         default:
           this.log.error('SCM toolset ' + this.options.scmtool + ' is not currently available. Skipping SCM script setup');
-          break;}
+          break;
+      }
     }.bind(this));
   },
 
-  writing: function () {
-  },
+  writing: function() {},
 
-  install: function () {
+  install: function() {
     this.installDependencies();
   }
 });

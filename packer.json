@@ -1,24 +1,25 @@
 {
   "primaryBuilder": {
-    "ami_name": "thisisanimage {{timestamp}}",
+    "ami_name": "test-image {{timestamp}}",
     "instance_type": "t2.large",
     "region": "us-west-2",
-    "source_amp": "asd-12312",
+    "source_amp": "ami-thisisanid",
     "ami_regions": [
       "us-west-2"
     ],
-    "ami_description": "descriptiondafs;lkewra",
+    "ami_description": "This is an AMI Description",
     "ami_groups": [
-      "543532534",
-      "252543542534",
-      "2354524325432534"
+      "group",
+      "group2",
+      "group3"
     ],
     "ami_users": [
-      "253524325432543",
-      "54325423235425342534",
-      "5432524352432534"
+      "account",
+      "account1",
+      "account2",
+      "account3"
     ],
-    "iam_instance_profile": "id-1231312"
+    "iam_instance_profile": "iam-thisisanid"
   },
   "primaryProvisioner": {
     "type": "chef-solo",

@@ -10,47 +10,41 @@ const yeoman = require('yeoman-generator'),
 const CM_TOOLS = ['chef', 'puppet', 'bash'];
 
 var BakeryGenerator = yeoman.Base.extend({
+
+  constructor: function() {
+    yeoman.Base.apply(this, arguments);
+    this._options.help.desc = 'Show this help';
+
+    /** @property {object} answers - prompt answers */
+    this.answers = {};
+
+    this.argument('projectname', {type: String, required: true});
+  },
+
   prompting: function () {
     // Have Yeoman greet the user.
     this.log(yosay(
       'Welcome to the super-excellent ' + chalk.red('bakery') + ' generator!'
     ));
 
-    var prompts = [
-    {
-      type: "input",
-      name: "projectname",
-      message: "Enter a name for your image."
-    }];
+    var prompts = [];
 
     return this.prompt(prompts).then(function (props) {
       this.props = props;
-      process.env.PROJECTNAME = this.props.projectname;
+      process.env.PROJECTNAME = this.projectname;
 
-      this.composeWith('bakery:scm', {
-        options: {
-          projectname: this.props.projectname
-        }}, {});
+      this.composeWith('bakery:scm', { arguments: [process.env.PROJECTNAME] }, {});
 
-      this.composeWith('bakery:cm', {
-        options: {
-          projectname: this.props.projectname
-        }}, {});
+      this.composeWith('bakery:cm', { arguments: [process.env.PROJECTNAME] }, {});
 
-      this.composeWith('bakery:ci', {
-      options: {
-        projectname: this.props.projectname
-      }}, {});
+      this.composeWith('bakery:ci', { arguments: [process.env.PROJECTNAME] }, {});
 
-      this.composeWith('bakery:bake', {
-        options: {
-          projectname: this.props.projectname
-        }}, {}) ;
+      this.composeWith('bakery:bake', { arguments: [process.env.PROJECTNAME] }, {});
     }.bind(this));
   },
 
   writing: function () {
-
+    this.destinationRoot(process.env.PROJECTNAME + '/');
   },
 
   install: function () {
