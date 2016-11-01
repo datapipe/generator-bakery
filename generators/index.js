@@ -5,6 +5,8 @@ const yeoman = require('yeoman-generator'),
       bakery = require('../lib/bakery'),
     feedback = require('../lib/feedback'),
        debug = require('debug')('bakery:lib:github'),
+      mkdirp = require('mkdirp'),
+        path = require('path'),
            _ = require('lodash');
 
 const CM_TOOLS = ['chef', 'puppet', 'bash'];
@@ -21,6 +23,13 @@ var BakeryGenerator = yeoman.Base.extend({
     this.argument('projectname', {type: String, required: true});
   },
 
+  default: function() {
+    if (path.basename(this.destinationPath()) !== this.projectname) {
+      mkdirp(this.projectname);
+      this.destinationRoot(this.destinationPath(this.projectname));
+    }
+  },
+
   prompting: function () {
     // Have Yeoman greet the user.
     this.log(yosay(
@@ -32,20 +41,14 @@ var BakeryGenerator = yeoman.Base.extend({
     return this.prompt(prompts).then(function (props) {
       this.props = props;
       process.env.PROJECTNAME = this.projectname;
-
       this.composeWith('bakery:scm', { arguments: [process.env.PROJECTNAME] }, {});
-
       this.composeWith('bakery:cm', { arguments: [process.env.PROJECTNAME] }, {});
-
       this.composeWith('bakery:ci', { arguments: [process.env.PROJECTNAME] }, {});
-
       this.composeWith('bakery:bake', { arguments: [process.env.PROJECTNAME] }, {});
     }.bind(this));
   },
 
-  writing: function () {
-    this.destinationRoot(process.env.PROJECTNAME + '/');
-  },
+  writing: function () {  },
 
   install: function () {
     this.installDependencies();

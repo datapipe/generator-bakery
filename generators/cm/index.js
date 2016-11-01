@@ -15,7 +15,7 @@ const LICENSES = ['Proprietary - All Rights Reserved', 'Apache v2.0', 'GPL v3', 
  CHEF_FILELIST = [
       'recipes/default.rb',
       'spec/unit/recipes/default_spec.rb',
-      'spec/unit/spec_helper.rb',
+      'spec/spec_helper.rb',
       'test/recipes/default_spec.rb',
       '.gitignore',
       '.kitchen.yml',
@@ -105,6 +105,11 @@ var BakeryCM = yeoman.Base.extend({
       required: true
     }, {
       type: 'input',
+      name: 'initialversion',
+      message: 'Initial version for package:',
+      default: '0.1.0'
+    }, {
+      type: 'input',
       name: 'projecturl',
       message: 'Enter the project URL for this module:',
       when: function(response) {
@@ -134,19 +139,20 @@ var BakeryCM = yeoman.Base.extend({
       long_description: this.answers.longdescription,
       source_url: this.answers.sourceurl,
       pronect_url: this.answers.projecturl,
-      issues_url: this.answers.issuesurl
+      issues_url: this.answers.issuesurl,
+      version: this.answers.initialversion,
+      year: new Date().getFullYear()
     };
 
-    var base_dir = path.basename(__dirname);
 
     var fileList = [];
     switch (process.env.CM_TYPE) {
       case 'puppet':
-        this.sourceRoot('./templates/puppet');
+        this.sourceRoot(__dirname + '/templates/puppet');
         fileList = PUPPET_FILELIST;
         break;
       case 'chef':
-        this.sourceRoot('./templates/chef');
+        this.sourceRoot(__dirname + '/templates/chef');
         fileList = CHEF_FILELIST;
         break;
       default:
@@ -159,7 +165,7 @@ var BakeryCM = yeoman.Base.extend({
         this.destinationPath(file),
         replacements
       );
-    });
+    }.bind(this));
   },
 
   install: function() {

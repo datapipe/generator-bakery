@@ -138,7 +138,7 @@ var BakeryBake = yeoman.Base.extend({
         return 'AMI ID in ' + response.primaryregion + ' region:';
       },
       when: function(response) {
-        return response.createami && response.primaryregion.length > 0;
+        return response.createami;
       }
     }, {
       type: 'input',
