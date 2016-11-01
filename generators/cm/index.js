@@ -10,8 +10,35 @@ const yeoman = require('yeoman-generator'),
   path = require('path'),
   _ = require('lodash');
 
-const LICENSES = ['Proprietary - All Rights Reserved', 'Apache v2.0', 'GPL v3', 'MIT', 'ISC'];
-const CM_TOOLS = ['chef', 'puppet', 'bash'];
+const LICENSES = ['Proprietary - All Rights Reserved', 'Apache v2.0', 'GPL v3', 'MIT', 'ISC'],
+      CM_TOOLS = ['chef', 'puppet', 'bash'],
+ CHEF_FILELIST = [
+      'recipes/default.rb',
+      'spec/unit/recipes/default_spec.rb',
+      'spec/unit/spec_helper.rb',
+      'test/recipes/default_spec.rb',
+      '.gitignore',
+      '.kitchen.yml',
+      'Berksfile',
+      'chefignore',
+      'Gemfile',
+      'metadata.rb',
+      'packer_variables.json',
+      'README.md'],
+PUPPET_FILELIST = [
+      'hiera/hiera.yml',
+      'manifests/default.pp',
+      'modules/README.md',
+      'spec/classes/init_spec.rb',
+      'spec/spec_helper.rb',
+      '.fixtures.yml',
+      '.gitignore',
+      'Gemfile',
+      'hiera.yaml',
+      'metadata.json',
+      'Rakefile',
+      'README.md'
+    ];
 
 var BakeryCM = yeoman.Base.extend({
 
@@ -110,34 +137,29 @@ var BakeryCM = yeoman.Base.extend({
       issues_url: this.answers.issuesurl
     };
 
+    var base_dir = path.basename(__dirname);
+
     var fileList = [];
     switch (process.env.CM_TYPE) {
       case 'puppet':
-        fileList = glob(path.basename(__dirname).join('/templates/puppet/**/*'), function(err, files) {
-          return files;
-        });
-        debug('Puppet repo setup');
-        debug(filelist);
+        this.sourceRoot('./templates/puppet');
+        fileList = PUPPET_FILELIST;
         break;
       case 'chef':
-        fileList = glob(path.basename(__dirname).join('/templates/chef/**/*'), function(err, files) {
-          return files;
-        });
-        debug('Chef repo setup');
-        debug(filelist);
+        this.sourceRoot('./templates/chef');
+        fileList = CHEF_FILELIST;
         break;
       default:
         this.log.error('CM tool ' + process.env.CM_TYPE + ' is not yet implemented. Ignoring CM setup');
         break;
-    }
-  },
-
-  _chefRepoBase: function(replacementVariables) {
-
-  },
-
-  _puppetRepoBase: function(replacementVariables) {
-
+    };
+    _.forEach(fileList, function(file) {
+      this.fs.copyTpl(
+        this.templatePath(file),
+        this.destinationPath(file),
+        replacements
+      );
+    });
   },
 
   install: function() {
