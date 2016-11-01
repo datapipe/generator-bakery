@@ -1,11 +1,11 @@
 'use strict';
 const yeoman = require('yeoman-generator'),
-       chalk = require('chalk'),
-       yosay = require('yosay'),
-      bakery = require('../../lib/bakery'),
-    feedback = require('../../lib/feedback'),
-       debug = require('debug')('bakery:lib:github'),
-           _ = require('lodash');
+  chalk = require('chalk'),
+  yosay = require('yosay'),
+  bakery = require('../../lib/bakery'),
+  feedback = require('../../lib/feedback'),
+  debug = require('debug')('bakery:lib:github'),
+  _ = require('lodash');
 
 const CI_TOOLS = ['jenkins', 'drone'];
 
@@ -19,14 +19,13 @@ var BakeryCI = yeoman.Base.extend({
     /** @property {object} answers - prompt answers */
     this.answers = {};
 
-    this.option('projectname', {
-      desc: 'Name of the project being created',
+    this.argument('projectname', {
       type: String,
-      alias: 'n'
+      required: true
     });
   },
 
-  prompting: function () {
+  prompting: function() {
 
     this.log(bakery.banner('Continuous Integration!'));
 
@@ -35,8 +34,7 @@ var BakeryCI = yeoman.Base.extend({
       name: "createci",
       message: "Create CI Scripts?",
       default: true
-    },
-    {
+    }, {
       type: "list",
       name: "citool",
       message: "Continuous Integration (CI) tool:",
@@ -46,10 +44,10 @@ var BakeryCI = yeoman.Base.extend({
       }
     }];
 
-    return this.prompt(prompts).then(function (props) {
+    return this.prompt(prompts).then(function(props) {
       this.props = props;
       process.env.CI_TYPE = this.props.citool;
-      switch (this.props.citool){
+      switch (this.props.citool) {
         case 'drone':
           //do something
           break;
@@ -58,15 +56,16 @@ var BakeryCI = yeoman.Base.extend({
           break;
         default:
           this.log.error('CI toolset ' + this.options.citool + ' is not currently available. Skipping CI script setup');
-          break;}
+          break;
+      }
     }.bind(this));
   },
 
-  writing: function () {
+  writing: function() {
 
   },
 
-  install: function () {
+  install: function() {
     this.installDependencies();
   }
 });

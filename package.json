@@ -27,7 +27,8 @@
     "debug": "^2.2.0",
     "nodegit": "^0.15.1",
     "octonode": "0.7.5",
-    "yeoman-environment": "^1.0.3"
+    "yeoman-environment": "^1.0.3",
+    "mkdirp": "^0.5.1"
   },
   "devDependencies": {
     "yeoman-test": "^1.0.0",
