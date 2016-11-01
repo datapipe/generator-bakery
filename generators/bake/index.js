@@ -248,7 +248,7 @@ var BakeryBake = yeoman.Base.extend({
       case 'puppet':
         primaryProvisioner['type'] = 'puppet-masterless';
         primaryProvisioner['manifest_file'] = 'manifests/';
-        primaryProvisioner['hiera_config_path'] = 'hiera/';
+        primaryProvisioner['hiera_config_path'] = 'hiera.yaml';
         primaryProvisioner['module_paths'] = 'modules/';
         break;
       default:
