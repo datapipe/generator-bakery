@@ -31,6 +31,24 @@ yo bakery <project_name>
  * Yeoman can be too opinionated at times but is easily convinced not to be.
  * Feel free to [learn more about Yeoman](http://yeoman.io/).
 
+## General workflow
+
+![welcome!](docs/images/welcomescreen.png)
+
+![Source Control Management](docs/images/scmscreen.png)
+
+![Continuous Integration](docs/images/ciscreen.png)
+
+![Configuration Management](docs/images/cmscreen.png)
+
+![Bakery!](docs/images/bakeryscreen.png)
+
+![Select Multiple Regions](docs/images/selectmultipleregionsscreen.png)
+
+![Select Primary Region](docs/images/primaryregionscreen.png)
+
+
+
 ## License
 
 ISC © [Datapipe](https://datapipe.com/)
