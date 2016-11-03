@@ -19,9 +19,17 @@ var BakeryCI = yeoman.Base.extend({
 
     /** @property {object} answers - prompt answers */
     this.answers = {};
+
     this.argument('projectname', {
       type: String,
       required: true
+    });
+
+    this.option('awsprofile', {
+      type: String,
+      alias: 'p',
+      desc: 'Name of the AWS profile to use when calling the AWS api for value validation',
+      default: 'default'
     });
   },
 
@@ -33,7 +41,7 @@ var BakeryCI = yeoman.Base.extend({
       type: "confirm",
       name: "createscm",
       message: "Attempt to create Source Control repository?",
-      default: true
+      default: this.config.get('createscm') || true
     }, {
       type: "list",
       name: "scmtool",
@@ -41,25 +49,42 @@ var BakeryCI = yeoman.Base.extend({
       choices: SCM_TOOLS,
       when: function(response) {
         return response.createscm;
-      }
+      },
+      default: this.config.get('scmtool') || SCM_TOOLS[0]
+    }, {
+      type: "input",
+      name: "scmurl",
+      message: "Source Control Management URL:",
+      when: function(response) {
+        return yeoman.createscm != true;
+      },
+      default: this.config.get('scmurl') || ""
     }];
 
     return this.prompt(prompts).then(function(props) {
-      this.props = props;
-      switch (this.props.scmtool) {
+      this.answers = props;
+      switch (this.answers.scmtool) {
         case 'github':
         case 'github-enterprise':
           // need to implement this...
           this.log('Still need to implement this...');
           break;
         default:
-          this.log.error('SCM toolset ' + this.options.scmtool + ' is not currently available. Skipping SCM script setup');
+          this.log.error('SCM toolset ' + this.answers.scmtool + ' is not currently available. Skipping SCM script setup');
           break;
       }
     }.bind(this));
   },
 
   writing: function() {},
+
+  default: {
+    /*saveConfig: function() {
+      _.forOwn(this.answers, function(value, key) {
+        this.config.set(key, value);
+      })
+    }*/
+  },
 
   install: function() {
     this.installDependencies();

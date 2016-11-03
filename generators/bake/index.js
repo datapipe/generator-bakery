@@ -44,16 +44,16 @@ var BakeryBake = yeoman.Base.extend({
     /** @property {object} answers - prompt answers */
     this.answers = {};
 
-    this.option('citype', {
-      desc: 'Specify the CI Toolset to be used',
-      type: String,
-      alias: 't'
-    });
-
     this.option('projectname', {
       desc: 'Name of the project being created',
       type: String,
       alias: 'n'
+    });
+
+    this.option('awsprofile', {
+      type: String,
+      alias: 'p',
+      desc: 'Name of the AWS profile to use when calling the AWS api for value validation'
     });
   },
 
@@ -92,6 +92,7 @@ var BakeryBake = yeoman.Base.extend({
       },
       default: process.env.AWS_REGION || 'us-west-2',
       validate: function(response) {
+        feedback.info(response);
         if (response.length < 0) {
           return 'You must choose at least one AWS Region.';
         }
@@ -124,14 +125,6 @@ var BakeryBake = yeoman.Base.extend({
         return response.createami;
       }
     }, {
-      type: 'confirm',
-      name: 'iswindows',
-      message: 'Is this a Windows-based image:',
-      default: false,
-      when: function(response) {
-        return response.createami;
-      }
-    }, {
       type: 'input',
       name: 'regionspecificami',
       message: function(response) {
@@ -139,6 +132,14 @@ var BakeryBake = yeoman.Base.extend({
       },
       when: function(response) {
         return response.createami;
+      },
+      validate: function(response) {
+        return bakery.validateAMIId(response, {
+          awsregion: response.primaryregion || 'us-west-2',
+          awsprofile: process.env.AWS_PROFILE || 'default'
+        }).then(function(successful) {
+          return successful;
+        });
       }
     }, {
       type: 'input',
@@ -194,74 +195,98 @@ var BakeryBake = yeoman.Base.extend({
           //do something
           break;
         default:
-          this.log.error('CI toolset ' + this.options.citype + ' is not currently available. Skipping CI script setup');
+          this.log.error('CI toolset ' + process.env.CI_TYPE + ' is not currently available. Skipping CI script setup');
           break;
       }
     }.bind(this));
   },
 
   writing: function() {
-    var primaryBuilder = {
-      ami_name: this.props.aminame || process.env.PROJECTNAME + ' {{timestamp}}',
-      instance_type: this.props.buildimagetype,
-      region: this.props.primaryregion,
-      source_amp: this.props.regionspecificami
-    };
-    if (this.props.awsregions.length > 1) {
-      primaryBuilder['ami_regions'] = this.props.awsregions.splice(this.props.awsregions.indexOf(this.props.primaryregion), 1);
-    };
-    if (typeof this.props.amidescription !== 'undefined' && this.props.amidescription.length > 0) {
-      primaryBuilder['ami_description'] = this.props.amidescription;
-    };
-    if (typeof this.props.amigroups !== 'undefined' && this.props.amigroups.length > 0) {
-      primaryBuilder['ami_groups'] = this.props.amigroups.split(',');
-    };
-    if (typeof this.props.amiusers !== 'undefined' && this.props.amiusers.length > 0) {
-      primaryBuilder['ami_users'] = this.props.amiusers.split(',');
-    }
-    if (typeof this.props.vpcid !== 'undefined' && this.props.vpcid.length > 0) {
-      primaryBuilder['vpc_id'] = this.props.vpcid;
-    };
-    if (typeof this.props.subnetid !== 'undefined' && this.props.subnetid.length > 0) {
-      primaryBuilder['subnet_id'] = this.props.subnetid;
-    };
-    if (typeof this.props.securitygroupids !== 'undefined' && this.props.securitygroupids.length > 0) {
-      primaryBuilder['security_group_ids'] = this.props.securitygroupids.split(',');
-    };
-    if (typeof this.props.iaminstanceprofile !== 'undefined' && this.props.iaminstanceprofile.length > 0) {
-      primaryBuilder['iam_instance_profile'] = this.props.iaminstanceprofile;
+    var packerDictionary = {
+      variables: {
+        aws_access_key: "{{ env 'AWS_ACCESS_KEY_ID' }}",
+        aws_secret_key: "{{ env 'AWS_SECRET_ACCESS_KEY' }}",
+        instance_type: this.props.buildimagetype
+      },
+      builders: [],
+      provisioners: []
     };
 
+    packerDictionary.builders[0] = {};
+
+    packerDictionary.builders[0].type = "amazon-ebs";
+    packerDictionary.builders[0].access_key = "{{ user `aws_access_key` }}";
+    packerDictionary.builders[0].secret_key = "{{ user `aws_secret_key` }}";
+    packerDictionary.builders[0].ami_name = this.props.aminame || process.env.PROJECTNAME + ' {{timestamp}}';
+    packerDictionary.builders[0].instance_type = "{{ user `instance_type` }}";
+    packerDictionary.builders[0].region = this.props.primaryregion;
+    packerDictionary.builders[0].source_ami = this.props.regionspecificami;
+
+    if (this.props.awsregions.length > 1) {
+      packerDictionary.builders[0]['ami_regions'] = [];
+      this.props.awsregions.forEach(function(element) {
+        if (element != this.props.primaryregion) {
+          packerDictionary.builders[0]['ami_regions'].push(element);
+        }
+      }.bind(this));
+    };
+    if (typeof this.props.amidescription !== 'undefined' && this.props.amidescription.length > 0) {
+      packerDictionary.builders[0]['ami_description'] = this.props.amidescription;
+    };
+    if (typeof this.props.amigroups !== 'undefined' && this.props.amigroups.length > 0) {
+      packerDictionary.builders[0]['ami_groups'] = this.props.amigroups.split(',');
+    };
+    if (typeof this.props.amiusers !== 'undefined' && this.props.amiusers.length > 0) {
+      packerDictionary.builders[0]['ami_users'] = this.props.amiusers.split(',');
+    }
+    if (typeof this.props.vpcid !== 'undefined' && this.props.vpcid.length > 0) {
+      packerDictionary.builders[0]['vpc_id'] = this.props.vpcid;
+    };
+    if (typeof this.props.subnetid !== 'undefined' && this.props.subnetid.length > 0) {
+      packerDictionary.builders[0]['subnet_id'] = this.props.subnetid;
+    };
+    if (typeof this.props.securitygroupids !== 'undefined' && this.props.securitygroupids.length > 0) {
+      buildpackerDictionary.builders[0]['security_group_ids'] = this.props.securitygroupids.split(',');
+    };
+    if (typeof this.props.iaminstanceprofile !== 'undefined' && this.props.iaminstanceprofile.length > 0) {
+      packerDictionary.builders[0]['iam_instance_profile'] = this.props.iaminstanceprofile;
+    };
+
+    packerDictionary.provisioners[0] = {}
+
     var osType = 'unix';
-    if (this.props.iswindows) {
+    if (process.env.WINDOWSIMAGE) {
       osType = 'windows';
     };
 
-    var primaryProvisioner = {};
-
     switch (process.env.CM_TYPE) {
       case 'chef':
-        primaryProvisioner['type'] = 'chef-solo';
-        primaryProvisioner['cookbook_paths'] = ['../'];
-        primaryProvisioner['guest_os_type'] = osType;
+        packerDictionary.provisioners[0]['type'] = 'chef-solo';
+        packerDictionary.provisioners[0]['cookbook_paths'] = ['../'];
+        packerDictionary.provisioners[0]['guest_os_type'] = osType;
         break;
       case 'puppet':
-        primaryProvisioner['type'] = 'puppet-masterless';
-        primaryProvisioner['manifest_file'] = 'manifests/';
-        primaryProvisioner['hiera_config_path'] = 'hiera.yaml';
-        primaryProvisioner['module_paths'] = 'modules/';
+        packerDictionary.provisioners[0]['type'] = 'puppet-masterless';
+        packerDictionary.provisioners[0]['manifest_file'] = 'manifests/';
+        primarpackerDictionary.provisioners[0]['hiera_config_path'] = 'hiera.yaml';
+        packerDictionary.provisioners[0]['module_paths'] = 'modules/';
         break;
       default:
         this.log.error('CM Toolset ' + process.env.CM_TYPE + ' is not currently supported or available.');
         break;
     }
 
-    var packerDictionary = {
-      primaryBuilder,
-      primaryProvisioner
-    };
-
     this.fs.writeJSON('packer.json', packerDictionary);
+  },
+
+
+
+  default: {
+    saveConfig: function() {
+      _.forOwn(this.answers, function(value, key) {
+        this.config.set(key, value);
+      })
+    }
   },
 
   install: function() {
