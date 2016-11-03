@@ -61,6 +61,14 @@ var BakeryCI = yeoman.Base.extend({
     }.bind(this));
   },
 
+  default: {
+    saveConfig: function() {
+      _.forOwn(this.answers, function(value, key) {
+        this.config.set(key, value);
+      })
+    }
+  },
+  
   writing: function() {
     var file = "";
     switch (this.env.CI_TYPE) {

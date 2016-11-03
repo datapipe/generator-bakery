@@ -13,7 +13,7 @@ npm install -g generator-bakery
 Then generate your new project:
 
 ```bash
-yo bakery
+yo bakery <project_name>
 ```
 
 ## Chef Users
@@ -35,10 +35,9 @@ yo bakery
 
 ISC © [Datapipe](https://datapipe.com/)
 
-
 [npm-image]: https://badge.fury.io/js/generator-imagebuild.svg
 [npm-url]: https://npmjs.org/package/generator-imagebuild
-[travis-image]: https://travis-ci.org/patrickmcclory/generator-imagebuild.svg?branch=master
-[travis-url]: https://travis-ci.org/patrickmcclory/generator-imagebuild
-[daviddm-image]: https://david-dm.org/patrickmcclory/generator-imagebuild.svg?theme=shields.io
-[daviddm-url]: https://david-dm.org/patrickmcclory/generator-imagebuild
+[travis-image]: https://travis-ci.org/datapipe/generator-imagebuild.svg?branch=master
+[travis-url]: https://travis-ci.org/datapipe/generator-imagebuild
+[daviddm-image]: https://david-dm.org/datapipe/generator-imagebuild.svg?theme=shields.io
+[daviddm-url]: https://david-dm.org/datapipe/generator-imagebuild

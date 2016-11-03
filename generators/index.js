@@ -1,13 +1,13 @@
 'use strict';
 const yeoman = require('yeoman-generator'),
-       chalk = require('chalk'),
-       yosay = require('yosay'),
-      bakery = require('../lib/bakery'),
-    feedback = require('../lib/feedback'),
-       debug = require('debug')('bakery:generator:index'),
-      mkdirp = require('mkdirp'),
-        path = require('path'),
-           _ = require('lodash');
+  chalk = require('chalk'),
+  yosay = require('yosay'),
+  bakery = require('../lib/bakery'),
+  feedback = require('../lib/feedback'),
+  debug = require('debug')('bakery:generator:index'),
+  mkdirp = require('mkdirp'),
+  path = require('path'),
+  _ = require('lodash');
 
 const CM_TOOLS = ['chef', 'puppet', 'bash'];
 
@@ -19,18 +19,41 @@ var BakeryGenerator = yeoman.Base.extend({
 
     /** @property {object} answers - prompt answers */
     this.answers = {};
+    this.existingProject = false;
 
-    this.argument('projectname', {type: String, required: true});
+    this.argument('projectname', {
+      type: String,
+      required: function () {
+        return this.projectname != Undefined;
+      }
+    });
   },
 
-  default: function() {
-    if (path.basename(this.destinationPath()) !== this.projectname) {
-      mkdirp(this.projectname);
-      this.destinationRoot(this.destinationPath(this.projectname));
+  initializing: {
+    loadConfig: function() {
+      this.projectname = this.config.get('projectname');
+      var configFound = this.baseName !== undefined && this.applicationType !== undefined;
+      if (configFound) {
+        this.existingProject = true;
+      }
     }
   },
 
-  prompting: function () {
+  default: {
+    function() {
+      if (path.basename(this.destinationPath()) !== this.projectname) {
+        mkdirp(this.projectname);
+        this.destinationRoot(this.destinationPath(this.projectname));
+      }
+    },
+
+    saveConfig: function() {
+      this.config.set('projectname', this.projectname);
+      this.config.saveConfig()
+    },
+  },
+
+  prompting: function() {
     // Have Yeoman greet the user.
     this.log(yosay(
       'Welcome to the super-excellent ' + chalk.red('bakery') + ' generator!'
@@ -38,19 +61,27 @@ var BakeryGenerator = yeoman.Base.extend({
 
     var prompts = [];
 
-    return this.prompt(prompts).then(function (props) {
+    return this.prompt(prompts).then(function(props) {
       this.props = props;
       process.env.PROJECTNAME = this.projectname;
-      this.composeWith('bakery:scm', { arguments: [process.env.PROJECTNAME] }, {});
-      this.composeWith('bakery:cm', { arguments: [process.env.PROJECTNAME] }, {});
-      this.composeWith('bakery:ci', { arguments: [process.env.PROJECTNAME] }, {});
-      this.composeWith('bakery:bake', { arguments: [process.env.PROJECTNAME] }, {});
+      this.composeWith('bakery:scm', {
+        arguments: [process.env.PROJECTNAME]
+      }, {});
+      this.composeWith('bakery:cm', {
+        arguments: [process.env.PROJECTNAME]
+      }, {});
+      this.composeWith('bakery:ci', {
+        arguments: [process.env.PROJECTNAME]
+      }, {});
+      this.composeWith('bakery:bake', {
+        arguments: [process.env.PROJECTNAME]
+      }, {});
     }.bind(this));
   },
 
-  writing: function () {  },
+  writing: function() {},
 
-  install: function () {
+  install: function() {
     this.installDependencies();
   }
 });

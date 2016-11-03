@@ -33,7 +33,9 @@ var BakeryCI = yeoman.Base.extend({
       type: "confirm",
       name: "createscm",
       message: "Attempt to create Source Control repository?",
-      default: true
+      default: function() {
+        return yeoman.config.get('createscm') || true;
+      }
     }, {
       type: "list",
       name: "scmtool",
@@ -41,25 +43,46 @@ var BakeryCI = yeoman.Base.extend({
       choices: SCM_TOOLS,
       when: function(response) {
         return response.createscm;
+      },
+      default: function () {
+        return yeoman.config.get('scmtool') || SCM_TOOLS[0];
+      }
+    }, {
+      type: "list",
+      name: "scmurl",
+      message: "Source Control Management URL:",
+      when: function(response) {
+        return yeoman.createscm != true;
+      },
+      default: function() {
+        return this.config.get('scmurl') || "";
       }
     }];
 
     return this.prompt(prompts).then(function(props) {
-      this.props = props;
-      switch (this.props.scmtool) {
+      this.answers = props;
+      switch (this.answers.scmtool) {
         case 'github':
         case 'github-enterprise':
           // need to implement this...
           this.log('Still need to implement this...');
           break;
         default:
-          this.log.error('SCM toolset ' + this.options.scmtool + ' is not currently available. Skipping SCM script setup');
+          this.log.error('SCM toolset ' + this.answers.scmtool + ' is not currently available. Skipping SCM script setup');
           break;
       }
     }.bind(this));
   },
 
   writing: function() {},
+
+  default: {
+    saveConfig: function() {
+      _.forOwn(this.answers, function(value, key) {
+        this.config.set(key, value);
+      })
+    }
+  },
 
   install: function() {
     this.installDependencies();

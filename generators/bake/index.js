@@ -264,6 +264,16 @@ var BakeryBake = yeoman.Base.extend({
     this.fs.writeJSON('packer.json', packerDictionary);
   },
 
+
+
+  default: {
+    saveConfig: function() {
+      _.forOwn(this.answers, function(value, key) {
+        this.config.set(key, value);
+      })
+    }
+  },
+
   install: function() {
     this.installDependencies();
   }

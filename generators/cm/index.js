@@ -129,6 +129,15 @@ var BakeryCM = yeoman.Base.extend({
     }.bind(this));
   },
 
+  default: {
+    saveConfig: function() {
+      _.forOwn(this.answers, function(value, key) {
+        this.config.set(key, value);
+      })
+    }
+  },
+
+
   writing: function() {
     var replacements = {
       license: this.answers.license,
