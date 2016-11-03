@@ -25,10 +25,11 @@ var BakeryCI = yeoman.Base.extend({
       required: true
     });
 
-    this.option('awsProfile', {
+    this.option('awsprofile', {
       type: String,
       alias: 'p',
-      desc: 'Name of the AWS profile to use when calling the AWS api for value validation'
+      desc: 'Name of the AWS profile to use when calling the AWS api for value validation',
+      default: 'default'
     });
   },
 
@@ -40,9 +41,7 @@ var BakeryCI = yeoman.Base.extend({
       type: "confirm",
       name: "createscm",
       message: "Attempt to create Source Control repository?",
-      default: function() {
-        return yeoman.config.get('createscm') || true;
-      }
+      default: this.config.get('createscm') || true
     }, {
       type: "list",
       name: "scmtool",
@@ -51,19 +50,15 @@ var BakeryCI = yeoman.Base.extend({
       when: function(response) {
         return response.createscm;
       },
-      default: function() {
-        return yeoman.config.get('scmtool') || SCM_TOOLS[0];
-      }
+      default: this.config.get('scmtool') || SCM_TOOLS[0]
     }, {
-      type: "list",
+      type: "input",
       name: "scmurl",
       message: "Source Control Management URL:",
       when: function(response) {
         return yeoman.createscm != true;
       },
-      default: function() {
-        return this.config.get('scmurl') || "";
-      }
+      default: this.config.get('scmurl') || ""
     }];
 
     return this.prompt(prompts).then(function(props) {
@@ -84,11 +79,11 @@ var BakeryCI = yeoman.Base.extend({
   writing: function() {},
 
   default: {
-    saveConfig: function() {
+    /*saveConfig: function() {
       _.forOwn(this.answers, function(value, key) {
         this.config.set(key, value);
       })
-    }
+    }*/
   },
 
   install: function() {

@@ -27,8 +27,8 @@ var BakeryGenerator = yeoman.Base.extend({
         return this.projectname != Undefined;
       }
     });
-    
-    this.option('awsProfile', {
+
+    this.option('awsprofile', {
       type: String,
       alias: 'p',
       desc: 'Name of the AWS profile to use when calling the AWS api for value validation'
@@ -37,7 +37,6 @@ var BakeryGenerator = yeoman.Base.extend({
 
   initializing: {
     loadConfig: function() {
-      this.projectname = this.config.get('projectname');
       var configFound = this.baseName !== undefined && this.applicationType !== undefined;
       if (configFound) {
         this.existingProject = true;
@@ -53,13 +52,14 @@ var BakeryGenerator = yeoman.Base.extend({
       }
     },
 
-    saveConfig: function() {
+    /*saveConfig: function() {
       this.config.set('projectname', this.projectname);
       this.config.saveConfig()
-    },
+    },*/
   },
 
   prompting: function() {
+    process.env.AWS_PROFILE = this.options.awsprofile || 'default';
     // Have Yeoman greet the user.
     this.log(yosay(
       'Welcome to the super-excellent ' + chalk.red('bakery') + ' generator!'
@@ -71,20 +71,16 @@ var BakeryGenerator = yeoman.Base.extend({
       this.props = props;
       process.env.PROJECTNAME = this.projectname;
       this.composeWith('bakery:scm', {
-        arguments: [process.env.PROJECTNAME],
-        options: ['awsProfile': this.options.awsProfile]
+        arguments: [process.env.PROJECTNAME]
       }, {});
       this.composeWith('bakery:cm', {
-        arguments: [process.env.PROJECTNAME],
-        options: ['awsProfile': this.options.awsProfile]
+        arguments: [process.env.PROJECTNAME]
       }, {});
       this.composeWith('bakery:ci', {
-        arguments: [process.env.PROJECTNAME],
-        options: ['awsProfile': this.options.awsProfile]
+        arguments: [process.env.PROJECTNAME]
       }, {});
       this.composeWith('bakery:bake', {
-        arguments: [process.env.PROJECTNAME],
-        options: ['awsProfile': this.options.awsProfile]
+        arguments: [process.env.PROJECTNAME]
       }, {});
     }.bind(this));
   },

@@ -19,7 +19,7 @@ var BakeryCI = yeoman.Base.extend({
     /** @property {object} answers - prompt answers */
     this.answers = {};
 
-    this.option('awsProfile', {
+    this.option('awsprofile', {
       type: String,
       alias: 'p',
       desc: 'Name of the AWS profile to use when calling the AWS api for value validation'
@@ -68,11 +68,11 @@ var BakeryCI = yeoman.Base.extend({
   },
 
   default: {
-    saveConfig: function() {
+    /*saveConfig: function() {
       _.forOwn(this.answers, function(value, key) {
         this.config.set(key, value);
       })
-    }
+    }*/
   },
 
   writing: function() {
