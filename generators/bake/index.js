@@ -203,7 +203,7 @@ var BakeryBake = yeoman.Base.extend({
           //do something
           break;
         default:
-          this.log.error('CI toolset ' + process.env.CI_TYPE + ' is not currently available. Skipping CI script setup');
+          this.error('CI toolset ' + process.env.CI_TYPE + ' is not currently available. Skipping CI script setup');
           break;
       }
     }.bind(this));
@@ -280,7 +280,7 @@ var BakeryBake = yeoman.Base.extend({
         packerDictionary.provisioners[0]['module_paths'] = 'modules/';
         break;
       default:
-        this.log.error('CM Toolset ' + process.env.CM_TYPE + ' is not currently supported or available.');
+        feedback.warn('CM Toolset ' + process.env.CM_TYPE + ' is not currently supported or available.');
         break;
     }
 

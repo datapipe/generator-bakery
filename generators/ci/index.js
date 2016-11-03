@@ -61,7 +61,7 @@ var BakeryCI = yeoman.Base.extend({
           //do something
           break;
         default:
-          this.log.error('CI toolset ' + this.options.citool + ' is not currently available. Skipping CI script setup');
+          feedback.warn('CI toolset ' + this.options.citool + ' is not currently available. Skipping CI script setup');
           break;
       }
     }.bind(this));
@@ -85,7 +85,7 @@ var BakeryCI = yeoman.Base.extend({
         file = "Jenkinsfile.xml";
         break;
       default:
-        this.log.error('CI toolset ' + this.env.CI_TYPE + ' is not currently available. Skipping CI script setup.');
+        feedback.warn('CI toolset ' + this.env.CI_TYPE + ' is not currently available. Skipping CI script setup.');
         break;
     };
     if (file != "") {

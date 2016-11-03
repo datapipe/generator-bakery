@@ -172,7 +172,7 @@ var BakeryCM = yeoman.Base.extend({
         fileList = CHEF_FILELIST;
         break;
       default:
-        this.log.error('CM tool ' + process.env.CM_TYPE + ' is not yet implemented. Ignoring CM setup');
+        feedback.warn('CM tool ' + process.env.CM_TYPE + ' is not yet implemented. Ignoring CM setup');
         break;
     };
     _.forEach(fileList, function(file) {
