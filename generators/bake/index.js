@@ -142,6 +142,14 @@ var BakeryBake = yeoman.Base.extend({
         });
       }
     }, {
+      type: 'confirm',
+      name: 'iswindows',
+      message: 'Is this a Windows-based image:',
+      default: false,
+      when: function(response) {
+        return response.createami && !process.env.WINDOWSIMAGE;
+      }
+    }, {
       type: 'input',
       name: 'amigroups',
       message: 'Enter a list (comma separated) of groups to share this AMI with:',
@@ -255,7 +263,7 @@ var BakeryBake = yeoman.Base.extend({
     packerDictionary.provisioners[0] = {}
 
     var osType = 'unix';
-    if (process.env.WINDOWSIMAGE) {
+    if (process.env.WINDOWSIMAGE || this.props.iswindows) {
       osType = 'windows';
     };
 
