@@ -11,34 +11,35 @@ const yeoman = require('yeoman-generator'),
   _ = require('lodash');
 
 const LICENSES = ['Proprietary - All Rights Reserved', 'Apache v2.0', 'GPL v3', 'MIT', 'ISC'],
-      CM_TOOLS = ['chef', 'puppet', 'bash'],
- CHEF_FILELIST = [
-      'recipes/default.rb',
-      'spec/unit/recipes/default_spec.rb',
-      'spec/spec_helper.rb',
-      'test/recipes/default_spec.rb',
-      '.gitignore',
-      '.kitchen.yml',
-      'Berksfile',
-      'chefignore',
-      'Gemfile',
-      'metadata.rb',
-      'packer_variables.json',
-      'README.md'],
-PUPPET_FILELIST = [
-      'hiera/hiera.yml',
-      'manifests/default.pp',
-      'modules/README.md',
-      'spec/classes/init_spec.rb',
-      'spec/spec_helper.rb',
-      '.fixtures.yml',
-      '.gitignore',
-      'Gemfile',
-      'hiera.yaml',
-      'metadata.json',
-      'Rakefile',
-      'README.md'
-    ];
+  CM_TOOLS = ['chef', 'puppet', 'bash'],
+  CHEF_FILELIST = [
+    'recipes/default.rb',
+    'spec/unit/recipes/default_spec.rb',
+    'spec/spec_helper.rb',
+    'test/recipes/default_spec.rb',
+    '.gitignore',
+    '.kitchen.yml',
+    'Berksfile',
+    'chefignore',
+    'Gemfile',
+    'metadata.rb',
+    'packer_variables.json',
+    'README.md'
+  ],
+  PUPPET_FILELIST = [
+    'hiera/hiera.yml',
+    'manifests/default.pp',
+    'modules/README.md',
+    'spec/classes/init_spec.rb',
+    'spec/spec_helper.rb',
+    '.fixtures.yml',
+    '.gitignore',
+    'Gemfile',
+    'hiera.yaml',
+    'metadata.json',
+    'Rakefile',
+    'README.md'
+  ];
 
 var BakeryCM = yeoman.Base.extend({
 
@@ -53,6 +54,13 @@ var BakeryCM = yeoman.Base.extend({
       type: String,
       required: true
     });
+
+    this.option('awsProfile', {
+      type: String,
+      alias: 'p',
+      desc: 'Name of the AWS profile to use when calling the AWS api for value validation'
+    });
+
     var gitUser = github.getGitUser();
     this.user = gitUser || {};
   },
@@ -136,7 +144,6 @@ var BakeryCM = yeoman.Base.extend({
       })
     }
   },
-
 
   writing: function() {
     var replacements = {

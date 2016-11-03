@@ -23,9 +23,15 @@ var BakeryGenerator = yeoman.Base.extend({
 
     this.argument('projectname', {
       type: String,
-      required: function () {
+      required: function() {
         return this.projectname != Undefined;
       }
+    });
+    
+    this.option('awsProfile', {
+      type: String,
+      alias: 'p',
+      desc: 'Name of the AWS profile to use when calling the AWS api for value validation'
     });
   },
 
@@ -65,16 +71,20 @@ var BakeryGenerator = yeoman.Base.extend({
       this.props = props;
       process.env.PROJECTNAME = this.projectname;
       this.composeWith('bakery:scm', {
-        arguments: [process.env.PROJECTNAME]
+        arguments: [process.env.PROJECTNAME],
+        options: ['awsProfile': this.options.awsProfile]
       }, {});
       this.composeWith('bakery:cm', {
-        arguments: [process.env.PROJECTNAME]
+        arguments: [process.env.PROJECTNAME],
+        options: ['awsProfile': this.options.awsProfile]
       }, {});
       this.composeWith('bakery:ci', {
-        arguments: [process.env.PROJECTNAME]
+        arguments: [process.env.PROJECTNAME],
+        options: ['awsProfile': this.options.awsProfile]
       }, {});
       this.composeWith('bakery:bake', {
-        arguments: [process.env.PROJECTNAME]
+        arguments: [process.env.PROJECTNAME],
+        options: ['awsProfile': this.options.awsProfile]
       }, {});
     }.bind(this));
   },

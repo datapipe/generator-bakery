@@ -19,9 +19,16 @@ var BakeryCI = yeoman.Base.extend({
 
     /** @property {object} answers - prompt answers */
     this.answers = {};
+
     this.argument('projectname', {
       type: String,
       required: true
+    });
+
+    this.option('awsProfile', {
+      type: String,
+      alias: 'p',
+      desc: 'Name of the AWS profile to use when calling the AWS api for value validation'
     });
   },
 
@@ -44,7 +51,7 @@ var BakeryCI = yeoman.Base.extend({
       when: function(response) {
         return response.createscm;
       },
-      default: function () {
+      default: function() {
         return yeoman.config.get('scmtool') || SCM_TOOLS[0];
       }
     }, {

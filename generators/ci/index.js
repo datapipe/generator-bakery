@@ -19,6 +19,12 @@ var BakeryCI = yeoman.Base.extend({
     /** @property {object} answers - prompt answers */
     this.answers = {};
 
+    this.option('awsProfile', {
+      type: String,
+      alias: 'p',
+      desc: 'Name of the AWS profile to use when calling the AWS api for value validation'
+    });
+
     this.argument('projectname', {
       type: String,
       required: true
@@ -68,7 +74,7 @@ var BakeryCI = yeoman.Base.extend({
       })
     }
   },
-  
+
   writing: function() {
     var file = "";
     switch (this.env.CI_TYPE) {

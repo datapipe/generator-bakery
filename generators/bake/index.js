@@ -44,16 +44,16 @@ var BakeryBake = yeoman.Base.extend({
     /** @property {object} answers - prompt answers */
     this.answers = {};
 
-    this.option('citype', {
-      desc: 'Specify the CI Toolset to be used',
-      type: String,
-      alias: 't'
-    });
-
     this.option('projectname', {
       desc: 'Name of the project being created',
       type: String,
       alias: 'n'
+    });
+
+    this.option('awsProfile', {
+      type: String,
+      alias: 'p',
+      desc: 'Name of the AWS profile to use when calling the AWS api for value validation'
     });
   },
 
@@ -139,6 +139,13 @@ var BakeryBake = yeoman.Base.extend({
       },
       when: function(response) {
         return response.createami;
+      },
+      validate: function(response) {
+        var bakery.validateAMIId(response.regionspecificami, {
+          aws_region: response.primaryregion || 'us-west-2',
+          aws_profile: this.arguments.awsProfile || null
+        });
+        return true;
       }
     }, {
       type: 'input',
@@ -194,7 +201,7 @@ var BakeryBake = yeoman.Base.extend({
           //do something
           break;
         default:
-          this.log.error('CI toolset ' + this.options.citype + ' is not currently available. Skipping CI script setup');
+          this.log.error('CI toolset ' + process.env.CI_TYPE + ' is not currently available. Skipping CI script setup');
           break;
       }
     }.bind(this));
