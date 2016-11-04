@@ -103,6 +103,9 @@ var BakeryBake = yeoman.Base.extend({
       name: 'primaryregion',
       message: 'Choose a primary region for building in AWS:',
       when: function(response) {
+        if (response.awsregions.length == 1) {
+          response.primaryregion = response.awsregions[0]
+        }
         return (response.awsregions.length > 1);
       },
       choices: function(response) {
