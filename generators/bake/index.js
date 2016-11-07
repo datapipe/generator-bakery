@@ -121,6 +121,7 @@ var BakeryBake = yeoman.Base.extend({
       name: 'primaryregion',
       message: 'Choose a primary region for building in AWS:',
       when: function(response) {
+        if (!response.createami) return false;
         if (response.awsregions.length == 1) {
           _this.options['primaryregion'] = response.awsregions[0]
         }
@@ -252,6 +253,7 @@ var BakeryBake = yeoman.Base.extend({
     });
   },
   writing: function() {
+    if (!this.props.createami) return;
     var packerDictionary = {
       variables: {
         aws_access_key: "{{ env 'AWS_ACCESS_KEY_ID' }}",
