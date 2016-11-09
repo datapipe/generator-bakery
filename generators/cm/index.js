@@ -24,7 +24,8 @@ const LICENSES = ['Proprietary - All Rights Reserved', 'Apache v2.0', 'GPL v3', 
     'Gemfile',
     'metadata.rb',
     'packer_variables.json',
-    'README.md'
+    'README.md',
+    'with_zero.rb'
   ],
   PUPPET_FILELIST = [
     'hiera/hiera.yml',
