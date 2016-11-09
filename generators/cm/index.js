@@ -189,40 +189,53 @@ var BakeryCM = yeoman.Base.extend({
         break;
     };
 
+    // this was previously in the bake block but had to do with provisioners.
+    // --------------------------------------------------------
+    // --------------------------------------------------------
+    // packerDictionary.provisioners[0] = {}
+    // var osType = 'unix';
+    // if (process.env.WINDOWSIMAGE || this.options.iswindows) {
+    //   osType = 'windows';
+    // };
+    //
+    // switch (process.env.CM_TYPE) {
+    //   case 'chef':
+    //     packerDictionary.provisioners[0]['type'] = 'chef-solo';
+    //     packerDictionary.provisioners[0]['cookbook_paths'] = ['../'];
+    //     packerDictionary.provisioners[0]['guest_os_type'] = osType;
+    //     break;
+    //   case 'puppet':
+    //     packerDictionary.provisioners[0]['type'] = 'puppet-masterless';
+    //     packerDictionary.provisioners[0]['manifest_file'] = 'manifests/';
+    //     primarpackerDictionary.provisioners[0]['hiera_config_path'] = 'hiera.yaml';
+    //     packerDictionary.provisioners[0]['module_paths'] = 'modules/';
+    //     break;
+    //   default:
+    //     feedback.warn('CM Toolset ' + process.env.CM_TYPE + ' is not currently supported or available.');
+    //     break;
+    // }
+    //
+    // this.fs.writeJSON('packer.json', packerDictionary);
+    // --------------------------------------------------------
+    // --------------------------------------------------------
 
     var packer_options = {
       run_list: this.answers.run_list,
     };
 
-    // also need to update the packer1.json template
-    // perhaps try writeJSON
-    // console.log(packer_options);
-    // console.log(this.templatePath('chef_provisioner.json'));
-    // var provisioner_json = this.fs.readJSON(this.templatePath('chef_provisioner.json'));
-    var provisioner_json = this.fs.readJSON('/Users/johnramos/datapipe-git/yeoman/generator-bakery/generators/cm/templates/chef/chef_provisioner.json');
-    // console.log('before ----------');
-    // console.log(provisioner_json);
-    // console.log('after ----------');
+    var provisioner_json = this.fs.readJSON(this.templatePath('chef_provisioner.json'));
+    // var provisioner_json = this.fs.readJSON('/Users/johnramos/datapipe-git/yeoman/generator-bakery/generators/cm/templates/chef/chef_provisioner.json');
     var execute_command = 'cd /opt/chef/cookbooks/cookbooks-0 && sudo chef-client -z -o ' + packer_options.run_list + ' -c ../solo.rb';
     provisioner_json.provisioners[0].execute_command = execute_command
-    // console.log('-------------new provisioner_json-------------')
-    // console.log(provisioner_json);
-
     this.fs.extendJSON(this.destinationPath('packer.json'), provisioner_json);
 
-    // this.fs.copyTpl(
-    //   this.templatePath('packer1.json'),
-    //   this.destinationPath('projects/' + process.env.PROJECTNAME + '_packer1.json'),
-    //   packer_options
-    // )
-
-    // _.forEach(fileList, function(file) {
-    //   this.fs.copyTpl(
-    //     this.templatePath(file),
-    //     this.destinationPath(file),
-    //     replacements
-    //   );
-    // }.bind(this));
+    _.forEach(fileList, function(file) {
+      this.fs.copyTpl(
+        this.templatePath(file),
+        this.destinationPath(file),
+        replacements
+      );
+    }.bind(this));
   },
 
   install: function() {
