@@ -70,15 +70,15 @@ var BakeryGenerator = yeoman.Base.extend({
     return this.prompt(prompts).then(function(props) {
       this.props = props;
       process.env.PROJECTNAME = this.projectname;
-      this.composeWith('bakery:scm', {
-        arguments: [process.env.PROJECTNAME]
-      }, {});
+      // this.composeWith('bakery:scm', {
+      //   arguments: [process.env.PROJECTNAME]
+      // }, {});
       this.composeWith('bakery:cm', {
         arguments: [process.env.PROJECTNAME]
       }, {});
-      this.composeWith('bakery:ci', {
-        arguments: [process.env.PROJECTNAME]
-      }, {});
+      // this.composeWith('bakery:ci', {
+      //   arguments: [process.env.PROJECTNAME]
+      // }, {});
       this.composeWith('bakery:bake', {
         arguments: [process.env.PROJECTNAME]
       }, {});

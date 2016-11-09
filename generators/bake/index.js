@@ -8,7 +8,8 @@ const yeoman = require('yeoman-generator'),
   _ = require('lodash');
 
 const AWS_REGIONS = [{
-  name: 'us-east-1'
+  name: 'us-east-1',
+  checked: true
 }, {
   name: 'us-east-2'
 }, {
@@ -142,11 +143,12 @@ var BakeryBake = yeoman.Base.extend({
     // this runs the first set of prompts and returns the resulting Promise to cause the Yeoman
     //  run loop to pause until prompts are complete
     return this.prompt(initialPrompts).then(function(responses) {
-
+      console.log('-----------------------------------');
       // copy responses into this.options
       for(var response in responses) {
         if (responses.hasOwnProperty(response)) {
           _this.options[response] = responses[response];
+          console.log(response);
         }
       }
 
@@ -166,6 +168,7 @@ var BakeryBake = yeoman.Base.extend({
         message: function(response) {
           return 'AMI ID in ' + _this.options.primaryregion + ' region:';
         },
+        default: 'ami-c8580bdf',
         when: function(response) {
           return _this.options.createami;
         },
@@ -189,28 +192,30 @@ var BakeryBake = yeoman.Base.extend({
         when: function(response) {
           return _this.options.createami && !process.env.WINDOWSIMAGE;
         }
-      }, {
-        type: 'input',
-        name: 'amigroups',
-        message: 'Enter a list (comma separated) of groups to share this AMI with:',
-        when: function(response) {
-          return _this.options.createami;
-        }
-      }, {
-        type: 'input',
-        name: 'amiusers',
-        message: 'Enter a list of (comma separated) account id\'s to share this AMI with:',
-        when: function(response) {
-          return _this.options.createami;
-        }
-      }, {
-        type: 'input',
-        name: 'iaminstanceprofile',
-        message: 'Enter the IAM instance profile id you want to apply to instances while they are being built:',
-        when: function(response) {
-          return _this.options.createami;
-        }
-      }, {
+      },
+      // {
+      //   type: 'input',
+      //   name: 'amigroups',
+      //   message: 'Enter a list (comma separated) of groups to share this AMI with:',
+      //   when: function(response) {
+      //     return _this.options.createami;
+      //   }
+      // }, {
+      //   type: 'input',
+      //   name: 'amiusers',
+      //   message: 'Enter a list of (comma separated) account id\'s to share this AMI with:',
+      //   when: function(response) {
+      //     return _this.options.createami;
+      //   }
+      // }, {
+      //   type: 'input',
+      //   name: 'iaminstanceprofile',
+      //   message: 'Enter the IAM instance profile id you want to apply to instances while they are being built:',
+      //   when: function(response) {
+      //     return _this.options.createami;
+      //   }
+      // },
+      {
         type: 'input',
         name: 'vpcid',
         message: 'Enter VPC ID, leave blank for default VPC:',
@@ -253,84 +258,107 @@ var BakeryBake = yeoman.Base.extend({
     });
   },
   writing: function() {
-    if (!this.props.createami) return;
-    var packerDictionary = {
-      variables: {
-        aws_access_key: "{{ env 'AWS_ACCESS_KEY_ID' }}",
-        aws_secret_key: "{{ env 'AWS_SECRET_ACCESS_KEY' }}",
-        instance_type: this.options.buildimagetype
-      },
-      builders: [],
-      provisioners: []
-    };
-
-    packerDictionary.builders[0] = {};
-
-    packerDictionary.builders[0].type = "amazon-ebs";
-    packerDictionary.builders[0].access_key = "{{ user `aws_access_key` }}";
-    packerDictionary.builders[0].secret_key = "{{ user `aws_secret_key` }}";
-    packerDictionary.builders[0].ami_name = this.options.aminame || process.env.PROJECTNAME + ' {{timestamp}}';
-    packerDictionary.builders[0].instance_type = "{{ user `instance_type` }}";
-    packerDictionary.builders[0].region = this.option.primaryregion;
-    packerDictionary.builders[0].source_ami = this.options.regionspecificami;
-
-    if (this.options.awsregions.length > 1) {
-      packerDictionary.builders[0]['ami_regions'] = [];
-      this.options.awsregions.forEach(function(element) {
-        if (element != this.options.primaryregion) {
-          packerDictionary.builders[0]['ami_regions'].push(element);
-        }
-      }.bind(this));
-    };
-    if (typeof this.options.amidescription !== 'undefined' && this.options.amidescription.length > 0) {
-      packerDictionary.builders[0]['ami_description'] = this.options.amidescription;
-    };
-    if (typeof this.options.amigroups !== 'undefined' && this.options.amigroups.length > 0) {
-      packerDictionary.builders[0]['ami_groups'] = this.options.amigroups.split(',');
-    };
-    if (typeof this.options.amiusers !== 'undefined' && this.options.amiusers.length > 0) {
-      packerDictionary.builders[0]['ami_users'] = this.options.amiusers.split(',');
-    }
-    if (typeof this.options.vpcid !== 'undefined' && this.options.vpcid.length > 0) {
-      packerDictionary.builders[0]['vpc_id'] = this.options.vpcid;
-    };
-    if (typeof this.options.subnetid !== 'undefined' && this.options.subnetid.length > 0) {
-      packerDictionary.builders[0]['subnet_id'] = this.options.subnetid;
-    };
-    if (typeof this.options.securitygroupids !== 'undefined' && this.options.securitygroupids.length > 0) {
-      buildpackerDictionary.builders[0]['security_group_ids'] = this.options.securitygroupids.split(',');
-    };
-    if (typeof this.options.iaminstanceprofile !== 'undefined' && this.options.iaminstanceprofile.length > 0) {
-      packerDictionary.builders[0]['iam_instance_profile'] = this.options.iaminstanceprofile;
-    };
-
-    packerDictionary.provisioners[0] = {}
-
-    var osType = 'unix';
-    if (process.env.WINDOWSIMAGE || this.options.iswindows) {
-      osType = 'windows';
-    };
-
-    switch (process.env.CM_TYPE) {
-      case 'chef':
-        packerDictionary.provisioners[0]['type'] = 'chef-solo';
-        packerDictionary.provisioners[0]['cookbook_paths'] = ['../'];
-        packerDictionary.provisioners[0]['guest_os_type'] = osType;
-        break;
-      case 'puppet':
-        packerDictionary.provisioners[0]['type'] = 'puppet-masterless';
-        packerDictionary.provisioners[0]['manifest_file'] = 'manifests/';
-        primarpackerDictionary.provisioners[0]['hiera_config_path'] = 'hiera.yaml';
-        packerDictionary.provisioners[0]['module_paths'] = 'modules/';
-        break;
-      default:
-        feedback.warn('CM Toolset ' + process.env.CM_TYPE + ' is not currently supported or available.');
-        break;
+    if (typeof this.props !== 'undefined' && typeof this.props.createami !== 'undefined') {
+      if (!this.props.createami) return;
     }
 
-    this.fs.writeJSON('packer.json', packerDictionary);
+    // var packerDictionary = {
+    //   variables: {
+    //     aws_access_key: "{{ env 'AWS_ACCESS_KEY_ID' }}",
+    //     aws_secret_key: "{{ env 'AWS_SECRET_ACCESS_KEY' }}",
+    //     instance_type: this.options.buildimagetype
+    //   },
+    //   builders: [],
+    //   provisioners: []
+    // };
+    // packerDictionary.builders[0] = {};
+    // packerDictionary.builders[0].type = "amazon-ebs";
+    // packerDictionary.builders[0].access_key = "{{ user `aws_access_key` }}";
+    // packerDictionary.builders[0].secret_key = "{{ user `aws_secret_key` }}";
+    // packerDictionary.builders[0].ami_name = this.options.aminame || process.env.PROJECTNAME + ' {{timestamp}}';
+    // packerDictionary.builders[0].instance_type = "{{ user `instance_type` }}";
+    // packerDictionary.builders[0].region = this.option.primaryregion;
+    // packerDictionary.builders[0].source_ami = this.options.regionspecificami;
+    //
+    // if (this.options.awsregions.length > 1) {
+    //   packerDictionary.builders[0]['ami_regions'] = [];
+    //   this.options.awsregions.forEach(function(element) {
+    //     if (element != this.options.primaryregion) {
+    //       packerDictionary.builders[0]['ami_regions'].push(element);
+    //     }
+    //   }.bind(this));
+    // };
+    // if (typeof this.options.amidescription !== 'undefined' && this.options.amidescription.length > 0) {
+    //   packerDictionary.builders[0]['ami_description'] = this.options.amidescription;
+    // };
+    // if (typeof this.options.amigroups !== 'undefined' && this.options.amigroups.length > 0) {
+    //   packerDictionary.builders[0]['ami_groups'] = this.options.amigroups.split(',');
+    // };
+    // if (typeof this.options.amiusers !== 'undefined' && this.options.amiusers.length > 0) {
+    //   packerDictionary.builders[0]['ami_users'] = this.options.amiusers.split(',');
+    // }
+    // if (typeof this.options.vpcid !== 'undefined' && this.options.vpcid.length > 0) {
+    //   packerDictionary.builders[0]['vpc_id'] = this.options.vpcid;
+    // };
+    // if (typeof this.options.subnetid !== 'undefined' && this.options.subnetid.length > 0) {
+    //   packerDictionary.builders[0]['subnet_id'] = this.options.subnetid;
+    // };
+    // if (typeof this.options.securitygroupids !== 'undefined' && this.options.securitygroupids.length > 0) {
+    //   buildpackerDictionary.builders[0]['security_group_ids'] = this.options.securitygroupids.split(',');
+    // };
+    // if (typeof this.options.iaminstanceprofile !== 'undefined' && this.options.iaminstanceprofile.length > 0) {
+    //   packerDictionary.builders[0]['iam_instance_profile'] = this.options.iaminstanceprofile;
+    // };
+
+    // packerDictionary.provisioners[0] = {}
+    // var osType = 'unix';
+    // if (process.env.WINDOWSIMAGE || this.options.iswindows) {
+    //   osType = 'windows';
+    // };
+    //
+    // switch (process.env.CM_TYPE) {
+    //   case 'chef':
+    //     packerDictionary.provisioners[0]['type'] = 'chef-solo';
+    //     packerDictionary.provisioners[0]['cookbook_paths'] = ['../'];
+    //     packerDictionary.provisioners[0]['guest_os_type'] = osType;
+    //     break;
+    //   case 'puppet':
+    //     packerDictionary.provisioners[0]['type'] = 'puppet-masterless';
+    //     packerDictionary.provisioners[0]['manifest_file'] = 'manifests/';
+    //     primarpackerDictionary.provisioners[0]['hiera_config_path'] = 'hiera.yaml';
+    //     packerDictionary.provisioners[0]['module_paths'] = 'modules/';
+    //     break;
+    //   default:
+    //     feedback.warn('CM Toolset ' + process.env.CM_TYPE + ' is not currently supported or available.');
+    //     break;
+    // }
+    //
+    // this.fs.writeJSON('packer.json', packerDictionary);
+
+    // var packer_options = {
+    //   instance_type: this.options.buildimagetype,
+    //   primaryregion: this.options.primaryregion,
+    //   regionspecificami: this.options.regionspecificami,
+    //   buildimagetype: this.options.buildimagetype,
+    // }
+
+    // need to make it an extendJSON. read the block, put changes in, write.
+    var bake_json = this.fs.readJSON(this.templatePath('packer.json'));
+    console.log('bake_json-------------')
+    console.log(bake_json);
+    bake_json.builders[0].region = this.options.primaryregion;
+    bake_json.builders[0].source_ami = this.options.regionspecificami;
+    bake_json.builders[0].instance_type = this.options.buildimagetype;
+    var bake_tpl = this.fs.extendJSON(this.destinationPath('packer.json'), bake_json);
+
+    // write file
+    // this.fs.copyTpl(
+    //   this.templatePath('packer.json'),
+    //   this.destinationPath('packer.json'),
+    //   packer_options
+    // )
+
   },
-
 
 
   default: {

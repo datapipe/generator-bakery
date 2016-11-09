@@ -68,55 +68,69 @@ var BakeryCM = yeoman.Base.extend({
   prompting: function() {
     this.log(bakery.banner('Configuration Management!'));
     var userInfo = github.getGitUser() || {};
-    var prompts = [{
-      type: 'list',
-      name: 'license',
-      message: 'Choose a license to apply to the new project:',
-      choices: LICENSES,
-      required: true
-    }, {
+    var prompts = [
+    // {
+    //   type: 'list',
+    //   name: 'license',
+    //   message: 'Choose a license to apply to the new project:',
+    //   choices: LICENSES,
+    //   required: true
+    // },
+    {
       type: "list",
       name: "cmtool",
       message: "Configuration Management (CM) tool:",
       choices: CM_TOOLS,
       required: true
-    }, {
-      type: 'input',
-      name: 'authorname',
-      message: "Enter the author's full name or organization:",
-      default: userInfo.name,
-      required: true
-    }, {
-      type: 'input',
-      name: 'authoremail',
-      message: "Enter the author or organization's email:",
-      default: userInfo.email
-    }, {
-      type: 'input',
-      name: 'shortdescription',
-      message: 'Enter a short description of the project:',
-      required: true
-    }, {
-      type: 'input',
-      name: 'longdescription',
-      message: 'Enter a long description of the project:',
-      required: true
-    }, {
-      type: 'input',
-      name: 'issuesurl',
-      message: 'Enter the issues URL:',
-      required: true
-    }, {
-      type: 'input',
-      name: 'sourceurl',
-      message: 'Enter the source URL:',
-      required: true
-    }, {
+    },
+    // {
+    //   type: 'input',
+    //   name: 'authorname',
+    //   message: "Enter the author's full name or organization:",
+    //   default: userInfo.name,
+    //   required: true
+    // }, {
+    //   type: 'input',
+    //   name: 'authoremail',
+    //   message: "Enter the author or organization's email:",
+    //   default: userInfo.email
+    // }, {
+    //   type: 'input',
+    //   name: 'shortdescription',
+    //   message: 'Enter a short description of the project:',
+    //   required: true
+    // }, {
+    //   type: 'input',
+    //   name: 'longdescription',
+    //   message: 'Enter a long description of the project:',
+    //   required: true
+    // }, {
+    //   type: 'input',
+    //   name: 'issuesurl',
+    //   message: 'Enter the issues URL:',
+    //   required: true
+    // }, {
+    //   type: 'input',
+    //   name: 'sourceurl',
+    //   message: 'Enter the source URL:',
+    //   required: true
+    // },
+    {
       type: 'input',
       name: 'initialversion',
       message: 'Initial version for package:',
       default: '0.1.0'
-    }, {
+    },
+    {
+      type: 'input',
+      name: 'run_list',
+      message: 'Enter a run list',
+      default: 'recipe[sample_cookbook]',
+      when: function(response) {
+        return response.cmtool == 'chef';
+      }
+    },
+    {
       type: 'input',
       name: 'projecturl',
       message: 'Enter the project URL for this module:',
@@ -160,7 +174,6 @@ var BakeryCM = yeoman.Base.extend({
       year: new Date().getFullYear()
     };
 
-
     var fileList = [];
     switch (process.env.CM_TYPE) {
       case 'puppet':
@@ -175,13 +188,41 @@ var BakeryCM = yeoman.Base.extend({
         feedback.warn('CM tool ' + process.env.CM_TYPE + ' is not yet implemented. Ignoring CM setup');
         break;
     };
-    _.forEach(fileList, function(file) {
-      this.fs.copyTpl(
-        this.templatePath(file),
-        this.destinationPath(file),
-        replacements
-      );
-    }.bind(this));
+
+
+    var packer_options = {
+      run_list: this.answers.run_list,
+    };
+
+    // also need to update the packer1.json template
+    // perhaps try writeJSON
+    // console.log(packer_options);
+    // console.log(this.templatePath('chef_provisioner.json'));
+    // var provisioner_json = this.fs.readJSON(this.templatePath('chef_provisioner.json'));
+    var provisioner_json = this.fs.readJSON('/Users/johnramos/datapipe-git/yeoman/generator-bakery/generators/cm/templates/chef/chef_provisioner.json');
+    // console.log('before ----------');
+    // console.log(provisioner_json);
+    // console.log('after ----------');
+    var execute_command = 'cd /opt/chef/cookbooks/cookbooks-0 && sudo chef-client -z -o ' + packer_options.run_list + ' -c ../solo.rb';
+    provisioner_json.provisioners[0].execute_command = execute_command
+    // console.log('-------------new provisioner_json-------------')
+    // console.log(provisioner_json);
+
+    this.fs.extendJSON(this.destinationPath('packer.json'), provisioner_json);
+
+    // this.fs.copyTpl(
+    //   this.templatePath('packer1.json'),
+    //   this.destinationPath('projects/' + process.env.PROJECTNAME + '_packer1.json'),
+    //   packer_options
+    // )
+
+    // _.forEach(fileList, function(file) {
+    //   this.fs.copyTpl(
+    //     this.templatePath(file),
+    //     this.destinationPath(file),
+    //     replacements
+    //   );
+    // }.bind(this));
   },
 
   install: function() {

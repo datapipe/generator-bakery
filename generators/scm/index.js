@@ -67,7 +67,7 @@ var BakeryCI = yeoman.Base.extend({
         case 'github':
         case 'github-enterprise':
           // need to implement this...
-          feedback.log('Still need to implement this...');
+          // feedback.log('Still need to implement this...');
           break;
         default:
           feedback.warn('SCM toolset ' + this.answers.scmtool + ' is not currently available. Skipping SCM script setup');

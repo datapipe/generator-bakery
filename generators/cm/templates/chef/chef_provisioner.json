@@ -1,0 +1,11 @@
+{
+  "provisioners": [
+    {
+      "type": "chef-solo",
+      "cookbook_paths": ["cookbooks"],
+      "staging_directory": "/opt/chef/cookbooks",
+      "config_template": "with_zero.rb",
+      "execute_command": "cd /opt/chef/cookbooks/cookbooks-0 && sudo chef-client -z -o <%= run_list => -c ../solo.rb"
+    }
+  ]
+}
