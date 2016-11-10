@@ -2,3 +2,4 @@ packer.json
 node_modules
 coverage
 .DS_Store
+testing.sh

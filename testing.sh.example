@@ -1,0 +1,7 @@
+export GITHUB_API_ACCESS_TOKEN=your_token_here
+export GITHUB_HOSTNAME=github.datapipe.net
+export GITHUB_USER=your_username_here
+export GITHUB_ORG=Automation
+
+gulp test
+
