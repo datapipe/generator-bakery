@@ -17,9 +17,7 @@ var BakeryCI = yeoman.Base.extend({
     yeoman.Base.apply(this, arguments);
 
     this._options.help.desc = 'Show this help';
-  },
 
-  initiliazing: function () {
     let default_config = {
       scm: {
         active: true,
@@ -31,7 +29,6 @@ var BakeryCI = yeoman.Base.extend({
   },
 
   prompting: function() {
-
     this.log(bakery.banner('Project Setup!'));
 
     let scmInfo = this.config.get('scm');
@@ -55,7 +52,7 @@ var BakeryCI = yeoman.Base.extend({
       name: "scmhost",
       message: "Source Control Management hostname:",
       when: function(response) {
-        return yeoman.createscm != true;
+        return response.createscm != true;
       },
       default: scmInfo.scmhost
     }, {
@@ -63,33 +60,46 @@ var BakeryCI = yeoman.Base.extend({
       name: "organization",
       message: "Organization:",
       when: function(response) {
-        return yeoman.createscm != true;
+        return response.createscm != true;
       },
-      default: scmInfo.scmhost
+      default: scmInfo.organization
+    }, {
+      type: "input",
+      name: "repository",
+      message: "Repository name:",
+      when: function(response) {
+        return response.createscm != true;
+      },
+      default: scmInfo.repository
+    }
     ];
 
     return this.prompt(prompts).then(function(props) {
-      this.answers = props;
-      switch (this.answers.scmtool) {
-        case 'github':
-        case 'github-enterprise':
-          // need to implement this...
-          break;
-        default:
-          feedback.warn('SCM toolset ' + this.answers.scmtool + ' is not currently available. Skipping SCM script setup');
-          break;
+      let scmInfo = {
+        active: props.createscm,
+        scmtool: props.scmtool,
+        scmhost: props.scmhost,
+        organization: props.organization,
+        repository: props.repository
       }
+      this.config.set('scm', scmInfo);
+      this.config.save();
     }.bind(this));
   },
 
-  writing: function() {},
+  writing: function() {
+    switch (this.config.get('scmtool')) {
+      case 'github':
+      case 'github-enterprise':
+        // need to implement this...
+        break;
+      default:
+        feedback.warn('SCM toolset ' + this.config.get('scmtool') + ' is not currently available. Skipping SCM script setup');
+        break;
+    }
+  },
 
   default: {
-    /*saveConfig: function() {
-      _.forOwn(this.answers, function(value, key) {
-        this.config.set(key, value);
-      })
-    }*/
   },
 
   install: function() {

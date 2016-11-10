@@ -51,7 +51,7 @@ var BakeryCM = yeoman.Base.extend({
 
     this.argument('projectname', {
       type: String,
-      required: (this.config.get('bake').projectname == undefined)
+      required: (this.config.get('projectname') == undefined)
     });
 
     var gitUser = github.getGitUser();
@@ -71,7 +71,6 @@ var BakeryCM = yeoman.Base.extend({
     }
 
     this.config.defaults(gen_defaults);
-    console.log(this.config.getAll());
   },
 
   prompting: function() {
@@ -235,7 +234,6 @@ var BakeryCM = yeoman.Base.extend({
     // --------------------------------------------------------
 
     var packer_options = {
-      run_list: this.answers.run_list,
     };
 
     var provisioner_json = this.fs.readJSON(this.templatePath('chef_provisioner.json'));

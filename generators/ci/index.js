@@ -7,7 +7,9 @@ const yeoman = require('yeoman-generator'),
   debug = require('debug')('bakery:generators:ci:index'),
   _ = require('lodash');
 
-const CI_TOOLS = ['jenkins', 'drone'];
+const CI_TOOL_JENKINS = 'jenkins';
+const CI_TOOL_DRONE = 'drone';
+const CI_TOOLS = [ CI_TOOL_JENKINS, CI_TOOL_DRONE ];
 
 var BakeryCI = yeoman.Base.extend({
 
@@ -15,31 +17,30 @@ var BakeryCI = yeoman.Base.extend({
     yeoman.Base.apply(this, arguments);
 
     this._options.help.desc = 'Show this help';
+  },
 
-    /** @property {object} answers - prompt answers */
-    this.answers = {};
+  initializing: function() {
+    let gen_defaults = {
+      ci: {
+        active: true,
+        citool: CI_TOOL_JENKINS
+      }
+    }
 
-    this.option('awsprofile', {
-      type: String,
-      alias: 'p',
-      desc: 'Name of the AWS profile to use when calling the AWS api for value validation'
-    });
-
-    this.argument('projectname', {
-      type: String,
-      required: true
-    });
+    this.config.defaults(gen_defaults);
   },
 
   prompting: function() {
 
     this.log(bakery.banner('Continuous Integration!'));
 
+    let ciInfo = this.config.get('ci');
+
     var prompts = [{
       type: "confirm",
       name: "createci",
       message: "Create CI Scripts?",
-      default: true
+      default: ciInfo.active
     }, {
       type: "list",
       name: "citool",
@@ -47,45 +48,36 @@ var BakeryCI = yeoman.Base.extend({
       choices: CI_TOOLS,
       when: function(response) {
         return response.createci;
-      }
+      },
+      default: ciInfo.citool
     }];
 
     return this.prompt(prompts).then(function(props) {
-      this.props = props;
-      process.env.CI_TYPE = this.props.citool;
-      switch (this.props.citool) {
-        case 'drone':
-          //do something
-          break;
-        case 'jenkins':
-          //do something
-          break;
-        default:
-          feedback.warn('CI toolset ' + this.options.citool + ' is not currently available. Skipping CI script setup');
-          break;
-      }
+      let ciInfo = {
+        active: props.createci,
+        citool: props.citool
+      };
+      this.config.set('ci', ciInfo);
+      this.config.save();
+
     }.bind(this));
   },
 
   default: {
-    /*saveConfig: function() {
-      _.forOwn(this.answers, function(value, key) {
-        this.config.set(key, value);
-      })
-    }*/
   },
 
   writing: function() {
     var file = "";
-    switch (this.env.CI_TYPE) {
-      case 'drone':
+    let ciInfo = this.config.get('ci');
+    switch (ciInfo.createci) {
+      case CI_TOOL_DRONE:
         file = ".drone.yml";
         break;
-      case 'jenkins':
+      case CI_TOOL_JENKINS:
         file = "Jenkinsfile.xml";
         break;
       default:
-        feedback.warn('CI toolset ' + this.env.CI_TYPE + ' is not currently available. Skipping CI script setup.');
+        feedback.warn('CI toolset ' + ciInfo.createci + ' is not currently available. Skipping CI script setup.');
         break;
     };
     if (file != "") {

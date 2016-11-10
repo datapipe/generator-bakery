@@ -32,15 +32,15 @@ var BakeryGenerator = yeoman.Base.extend({
     this.option('awsprofile', {
       type: String,
       alias: 'p',
-      desc: 'Name of the AWS profile to use when calling the AWS api for value validation'
+      desc: 'Name of the AWS profile to use when calling the AWS api for value validation',
+      defaults: 'default'
     });
   },
 
   initializing: function() {
     let default_config = {
-      bake: {
-        source: CM_SOURCE_DIRECTORY
-      }
+      source: CM_SOURCE_DIRECTORY,
+      projectname: this.projectname
     }
     this.config.defaults(default_config);
 
@@ -60,42 +60,40 @@ var BakeryGenerator = yeoman.Base.extend({
   },
 
   prompting: function() {
-    process.env.AWS_PROFILE = this.options.awsprofile || 'default';
+    process.env.AWS_PROFILE = this.options.awsprofile;
     // Have Yeoman greet the user.
     this.log(yosay(
       'Welcome to the super-excellent ' + chalk.red('bakery') + ' generator!'
     ));
-
-    let cm = this.config.get('bake');
 
     let prompts = [{
       name: "projectname",
       type: "input",
       message: "Project name",
       when: function() { this.projectname == undefined },
-      default: this.config.get('projectname')
+      default: this.config.get('projectname'),
+      required: true
     },
     {
       name: "source",
       type: "list",
       choices: CM_SOURCES,
       message: "Choose source of configuration management code",
-      default: cm.source
+      default: this.config.get('source'),
+      required: true
     }];
 
     return this.prompt(prompts).then(function(props) {
-      let bake_conf = {
-        projectname: props.projectname,
-        source: props.source
-      };
-      this.config.set('bake', bake_conf);
+      this.config.set('projectname', props.projectname || this.projectname);
+      this.config.set('source', props.source);
       this.config.save();
 
-      let args = { arguments: [props.projectname || this.projectname]};
+      let projectname = this.config.get('projectname');
+      let args = { arguments: [ projectname ] };
 
       switch(props.source) {
         case CM_SOURCE_GENERATE:
-          this.composeWith('bakery:cm', args, {});
+          this.composeWith('bakery:cm', args);
           break;
         case CM_SOURCE_FORK:
           this.composeWith('bakery:cm-source-fork');
@@ -104,9 +102,11 @@ var BakeryGenerator = yeoman.Base.extend({
           this.composeWith('bakery:cm-source-local');
           break;
       }
-      this.composeWith('bakery:scm', args, {});
-      this.composeWith('bakery:ci', args, {});
-      this.composeWith('bakery:bake', args, {});
+      this.composeWith('bakery:scm');
+      this.composeWith('bakery:ci');
+
+      args.options = { awsprofile: this.options.awsprofile };
+      this.composeWith('bakery:bake', args);
     }.bind(this));
   },
 
