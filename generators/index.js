@@ -45,15 +45,6 @@ var BakeryGenerator = yeoman.Base.extend({
     }
   },
 
-  default: {
-    function() {
-      if (path.basename(this.destinationPath()) !== this.projectname) {
-        mkdirp(this.projectname);
-        this.destinationRoot(this.destinationPath(this.projectname));
-      }
-    },
-  },
-
   prompting: function() {
     process.env.AWS_PROFILE = this.options.awsprofile;
     // Have Yeoman greet the user.
@@ -83,6 +74,14 @@ var BakeryGenerator = yeoman.Base.extend({
       args.options = { awsprofile: this.options.awsprofile };
       this.composeWith('bakery:bake', args);
     }.bind(this));
+  },
+
+  configuring: function() {
+    let projectname = this.config.get('projectname');
+    if (path.basename(this.destinationPath()) !== projectname) {
+      mkdirp(projectname);
+      this.destinationRoot(this.destinationPath(projectname));
+    }
   },
 
   writing: function() {},
