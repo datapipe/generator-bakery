@@ -9,8 +9,6 @@ const yeoman = require('yeoman-generator'),
   path = require('path'),
   _ = require('lodash');
 
-const CM_TOOLS = ['chef', 'puppet', 'bash'];
-
 var BakeryGenerator = yeoman.Base.extend({
 
   constructor: function() {
@@ -23,24 +21,27 @@ var BakeryGenerator = yeoman.Base.extend({
 
     this.argument('projectname', {
       type: String,
-      required: function() {
-        return this.projectname != Undefined;
-      }
+      required: false,
+      defaults: ''
     });
 
     this.option('awsprofile', {
       type: String,
       alias: 'p',
-      desc: 'Name of the AWS profile to use when calling the AWS api for value validation'
+      desc: 'Name of the AWS profile to use when calling the AWS api for value validation',
+      defaults: 'default'
     });
   },
 
-  initializing: {
-    loadConfig: function() {
-      var configFound = this.baseName !== undefined && this.applicationType !== undefined;
-      if (configFound) {
-        this.existingProject = true;
-      }
+  initializing: function() {
+    let default_config = {
+      projectname: this.projectname
+    }
+    this.config.defaults(default_config);
+
+    var configFound = this.baseName !== undefined && this.applicationType !== undefined;
+    if (configFound) {
+      this.existingProject = true;
     }
   },
 
@@ -51,37 +52,36 @@ var BakeryGenerator = yeoman.Base.extend({
         this.destinationRoot(this.destinationPath(this.projectname));
       }
     },
-
-    /*saveConfig: function() {
-      this.config.set('projectname', this.projectname);
-      this.config.saveConfig()
-    },*/
   },
 
   prompting: function() {
-    process.env.AWS_PROFILE = this.options.awsprofile || 'default';
+    process.env.AWS_PROFILE = this.options.awsprofile;
     // Have Yeoman greet the user.
     this.log(yosay(
       'Welcome to the super-excellent ' + chalk.red('bakery') + ' generator!'
     ));
 
-    var prompts = [];
+    let prompts = [{
+      name: "projectname",
+      type: "input",
+      message: "Project name",
+      when: () => { return (this.projectname.length < 1); },
+      default: this.config.get('projectname'),
+      required: true
+    }];
 
     return this.prompt(prompts).then(function(props) {
-      this.props = props;
-      process.env.PROJECTNAME = this.projectname;
-      this.composeWith('bakery:scm', {
-        arguments: [process.env.PROJECTNAME]
-      }, {});
-      this.composeWith('bakery:cm', {
-        arguments: [process.env.PROJECTNAME]
-      }, {});
-      this.composeWith('bakery:ci', {
-        arguments: [process.env.PROJECTNAME]
-      }, {});
-      this.composeWith('bakery:bake', {
-        arguments: [process.env.PROJECTNAME]
-      }, {});
+      this.config.set('projectname', props.projectname || this.config.get('projectname'));
+      this.config.save();
+
+      let projectname = this.config.get('projectname');
+      let args = { arguments: [ projectname ] };
+      this.composeWith('bakery:cm', args);
+      this.composeWith('bakery:scm');
+      this.composeWith('bakery:ci');
+
+      args.options = { awsprofile: this.options.awsprofile };
+      this.composeWith('bakery:bake', args);
     }.bind(this));
   },
 
