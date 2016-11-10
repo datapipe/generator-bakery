@@ -9,7 +9,15 @@ const yeoman = require('yeoman-generator'),
   path = require('path'),
   _ = require('lodash');
 
-const CM_TOOLS = ['chef', 'puppet', 'bash'];
+const CM_TOOL_CHEF = 'chef';
+const CM_TOOL_PUPPET = 'puppet';
+const CM_TOOL_BASH = 'bash';
+const CM_TOOLS = [ CM_TOOL_CHEF, CM_TOOL_PUPPET, CM_TOOL_BASH ];
+
+const CM_SOURCE_DIRECTORY = 'directory';
+const CM_SOURCE_FORK = 'fork';
+const CM_SOURCE_GENERATE = 'generate'
+const CM_SOURCES = [ CM_SOURCE_DIRECTORY, CM_SOURCE_FORK, CM_SOURCE_GENERATE ];
 
 var BakeryGenerator = yeoman.Base.extend({
 
@@ -23,9 +31,7 @@ var BakeryGenerator = yeoman.Base.extend({
 
     this.argument('projectname', {
       type: String,
-      required: function() {
-        return this.projectname != Undefined;
-      }
+      required: false
     });
 
     this.option('awsprofile', {
@@ -35,13 +41,23 @@ var BakeryGenerator = yeoman.Base.extend({
     });
   },
 
-  initializing: {
+  initializing: function() {
+    let default_config = {
+      cm: {
+        type: CM_TOOL_BASH,
+        source: CM_SOURCE_DIRECTORY
+      }
+    }
+    this.config.defaults(default_config);
+
+/*
     loadConfig: function() {
       var configFound = this.baseName !== undefined && this.applicationType !== undefined;
       if (configFound) {
         this.existingProject = true;
       }
     }
+ */
   },
 
   default: {
@@ -51,11 +67,6 @@ var BakeryGenerator = yeoman.Base.extend({
         this.destinationRoot(this.destinationPath(this.projectname));
       }
     },
-
-    /*saveConfig: function() {
-      this.config.set('projectname', this.projectname);
-      this.config.saveConfig()
-    },*/
   },
 
   prompting: function() {
@@ -65,23 +76,54 @@ var BakeryGenerator = yeoman.Base.extend({
       'Welcome to the super-excellent ' + chalk.red('bakery') + ' generator!'
     ));
 
-    var prompts = [];
+    let cm = this.config.get('cm');
+
+    var prompts = [{
+      name: "projectname",
+      type: "input",
+      message: "Project name",
+      when: function() { this.projectname == undefined },
+      default: this.config.get('projectname')
+    },{
+      name: "type",
+      type: "list",
+      choices: CM_TOOLS,
+      message: "Choose a configuration managment tool",
+      default: cm.type
+    },
+    {
+      name: "source",
+      type: "list",
+      choices: CM_SOURCES,
+      message: "Choose a source configuration management template",
+      default: cm.source
+    }];
 
     return this.prompt(prompts).then(function(props) {
-      this.props = props;
-      process.env.PROJECTNAME = this.projectname;
-      this.composeWith('bakery:scm', {
-        arguments: [process.env.PROJECTNAME]
-      }, {});
-      this.composeWith('bakery:cm', {
-        arguments: [process.env.PROJECTNAME]
-      }, {});
-      this.composeWith('bakery:ci', {
-        arguments: [process.env.PROJECTNAME]
-      }, {});
-      this.composeWith('bakery:bake', {
-        arguments: [process.env.PROJECTNAME]
-      }, {});
+      let bake_conf = {
+        projectname: props.projectname,
+        type: props.type,
+        source: props.source
+      };
+      this.config.set('bake', bake_conf);
+      this.config.save();
+
+      let args = { arguments: [props.projectname || this.projectname]};
+
+      switch(props.source) {
+        case CM_SOURCE_DIRECTORY:
+          this.composeWith('bakery:cm', args, {});
+          break;
+        case CM_SOURCE_FORK:
+          this.composeWith('bakery:cm-source-fork');
+          break;
+        case CM_SOURCE_GENERATE:
+          this.composeWith('bakery:cm-source-generate');
+          break;
+      }
+      this.composeWith('bakery:scm', args, {});
+      this.composeWith('bakery:ci', args, {});
+      this.composeWith('bakery:bake', args, {});
     }.bind(this));
   },
 

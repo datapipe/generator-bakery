@@ -49,89 +49,89 @@ var BakeryCM = yeoman.Base.extend({
 
     this._options.help.desc = 'Show this help';
 
-    /** @property {object} answers - prompt answers */
-    this.answers = {};
     this.argument('projectname', {
       type: String,
-      required: true
-    });
-
-    this.option('awsprofile', {
-      type: String,
-      alias: 'p',
-      desc: 'Name of the AWS profile to use when calling the AWS api for value validation'
+      required: (this.config.get('bake').projectname == undefined)
     });
 
     var gitUser = github.getGitUser();
     this.user = gitUser || {};
   },
 
+  initializing: function() {
+    var userInfo = github.getGitUser() || {};
+    let gen_defaults = {
+      cm: {
+        license: LICENSES[0],
+        cmtool: CM_TOOLS[0],
+        authorname: userInfo.name,
+        authoremail: userInfo.email,
+        initialversion: '0.1.0'
+      }
+    }
+
+    this.config.defaults(gen_defaults);
+    console.log(this.config.getAll());
+  },
+
   prompting: function() {
     this.log(bakery.banner('Configuration Management!'));
-    var userInfo = github.getGitUser() || {};
-    var prompts = [
-    {
+    var genInfo = this.config.get('cm').generate;
+    var prompts = [{
       type: 'list',
       name: 'license',
       message: 'Choose a license to apply to the new project:',
       choices: LICENSES,
-      required: true
-    },
-    {
+      required: true,
+      default: genInfo.license
+    }, {
       type: "list",
       name: "cmtool",
       message: "Configuration Management (CM) tool:",
       choices: CM_TOOLS,
-      required: true
-    },
-    {
+      required: true,
+      default: genInfo.cmtool
+    }, {
       type: 'input',
       name: 'authorname',
       message: "Enter the author's full name or organization:",
-      default: userInfo.name,
+      default: genInfo.authorname,
       required: true
     }, {
       type: 'input',
       name: 'authoremail',
       message: "Enter the author or organization's email:",
-      default: userInfo.email
+      default: genInfo.authoremail
     }, {
       type: 'input',
       name: 'shortdescription',
       message: 'Enter a short description of the project:',
-      required: true
+      required: true,
+      default: genInfo.shortdescripton
     }, {
       type: 'input',
       name: 'longdescription',
       message: 'Enter a long description of the project:',
-      required: true
+      required: true,
+      default: genInfo.longdescription
     }, {
       type: 'input',
       name: 'issuesurl',
       message: 'Enter the issues URL:',
-      required: true
+      required: true,
+      default: genInfo.issueurl
     }, {
       type: 'input',
       name: 'sourceurl',
       message: 'Enter the source URL:',
-      required: true
-    },
-    {
+      required: true,
+      default: genInfo.sourceurl
+    }, {
       type: 'input',
       name: 'initialversion',
       message: 'Initial version for package:',
-      default: '0.1.0'
-    },
-    {
-      type: 'input',
-      name: 'run_list',
-      message: 'Enter a run list',
-      default: 'recipe[sample_cookbook]',
-      when: function(response) {
-        return response.cmtool == 'chef';
-      }
-    },
-    {
+      default: genInfo.initialversion
+    }, {
       type: 'input',
       name: 'projecturl',
       message: 'Enter the project URL for this module:',
@@ -140,12 +140,25 @@ var BakeryCM = yeoman.Base.extend({
       },
       required: function(response) {
         return response.cmtool == 'puppet';
-      }
+      },
+      default: genInfo.projecturl
     }];
 
     return this.prompt(prompts).then(function(props) {
-      // To access props later use this.props.someAnswer;
-      this.answers = props;
+      let gen_config = {
+        license: props.license,
+        cmtool: props.cmtool,
+        authorname: props.authorname,
+        authoremail: props.authoremail,
+        shortdescription: props.shortdescription,
+        longdescription: props.longdescription,
+        issuesurl: props.issuesurl,
+        sourceurl: props.sourceurl,
+        initialversion: props.initialversion,
+        projecturl: props.projecturl
+      };
+      this.config.set("cm.generate", gen_config);
+      this.config.save();
 
       // load to global to share with other components easily
       process.env.CM_TYPE = this.answers.cmtool;
