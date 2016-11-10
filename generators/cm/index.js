@@ -76,61 +76,61 @@ var BakeryCM = yeoman.Base.extend({
 
   prompting: function() {
     this.log(bakery.banner('Configuration Management!'));
-    var genInfo = this.config.get('cm').generate;
+    var cmInfo = this.config.get('cm');
     var prompts = [{
       type: 'list',
       name: 'license',
       message: 'Choose a license to apply to the new project:',
       choices: LICENSES,
       required: true,
-      default: genInfo.license
+      default: cmInfo.license
     }, {
       type: "list",
       name: "cmtool",
       message: "Configuration Management (CM) tool:",
       choices: CM_TOOLS,
       required: true,
-      default: genInfo.cmtool
+      default: cmInfo.cmtool
     }, {
       type: 'input',
       name: 'authorname',
       message: "Enter the author's full name or organization:",
-      default: genInfo.authorname,
+      default: cmInfo.authorname,
       required: true
     }, {
       type: 'input',
       name: 'authoremail',
       message: "Enter the author or organization's email:",
-      default: genInfo.authoremail
+      default: cmInfo.authoremail
     }, {
       type: 'input',
       name: 'shortdescription',
       message: 'Enter a short description of the project:',
       required: true,
-      default: genInfo.shortdescripton
+      default: cmInfo.shortdescripton
     }, {
       type: 'input',
       name: 'longdescription',
       message: 'Enter a long description of the project:',
       required: true,
-      default: genInfo.longdescription
+      default: cmInfo.longdescription
     }, {
       type: 'input',
       name: 'issuesurl',
       message: 'Enter the issues URL:',
       required: true,
-      default: genInfo.issueurl
+      default: cmInfo.issueurl
     }, {
       type: 'input',
       name: 'sourceurl',
       message: 'Enter the source URL:',
       required: true,
-      default: genInfo.sourceurl
+      default: cmInfo.sourceurl
     }, {
       type: 'input',
       name: 'initialversion',
       message: 'Initial version for package:',
-      default: genInfo.initialversion
+      default: cmInfo.initialversion
     }, {
       type: 'input',
       name: 'projecturl',
@@ -141,7 +141,7 @@ var BakeryCM = yeoman.Base.extend({
       required: function(response) {
         return response.cmtool == 'puppet';
       },
-      default: genInfo.projecturl
+      default: cmInfo.projecturl
     }];
 
     return this.prompt(prompts).then(function(props) {
@@ -157,11 +157,11 @@ var BakeryCM = yeoman.Base.extend({
         initialversion: props.initialversion,
         projecturl: props.projecturl
       };
-      this.config.set("cm.generate", gen_config);
+      this.config.set('cm', gen_config);
       this.config.save();
 
       // load to global to share with other components easily
-      process.env.CM_TYPE = this.answers.cmtool;
+      process.env.CM_TYPE = props.cmtool;
     }.bind(this));
   },
 
@@ -174,17 +174,18 @@ var BakeryCM = yeoman.Base.extend({
   },
 
   writing: function() {
+    let cmInfo = this.config.get('cm');
     var replacements = {
-      license: this.answers.license,
-      project_name: process.env.PROJECTNAME,
-      author_name: this.answers.authorname,
-      author_email: this.answers.authoremail,
-      short_description: this.answers.shortdescription,
-      long_description: this.answers.longdescription,
-      source_url: this.answers.sourceurl,
-      pronect_url: this.answers.projecturl,
-      issues_url: this.answers.issuesurl,
-      version: this.answers.initialversion,
+      license: cmInfo.license,
+      project_name: this.config.get('bake').projectname,
+      author_name: cmInfo.authorname,
+      author_email: cmInfo.authoremail,
+      short_description: cmInfo.shortdescription,
+      long_description: cmInfo.longdescription,
+      source_url: cmInfo.sourceurl,
+      pronect_url: cmInfo.projecturl,
+      issues_url: cmInfo.issuesurl,
+      version: cmInfo.initialversion,
       year: new Date().getFullYear()
     };
 

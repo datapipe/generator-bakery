@@ -9,14 +9,9 @@ const yeoman = require('yeoman-generator'),
   path = require('path'),
   _ = require('lodash');
 
-const CM_TOOL_CHEF = 'chef';
-const CM_TOOL_PUPPET = 'puppet';
-const CM_TOOL_BASH = 'bash';
-const CM_TOOLS = [ CM_TOOL_CHEF, CM_TOOL_PUPPET, CM_TOOL_BASH ];
-
-const CM_SOURCE_DIRECTORY = 'directory';
-const CM_SOURCE_FORK = 'fork';
-const CM_SOURCE_GENERATE = 'generate'
+const CM_SOURCE_DIRECTORY = 'Local Directory';
+const CM_SOURCE_FORK = 'Fork From SCM';
+const CM_SOURCE_GENERATE = 'Use Generator'
 const CM_SOURCES = [ CM_SOURCE_DIRECTORY, CM_SOURCE_FORK, CM_SOURCE_GENERATE ];
 
 var BakeryGenerator = yeoman.Base.extend({
@@ -43,21 +38,16 @@ var BakeryGenerator = yeoman.Base.extend({
 
   initializing: function() {
     let default_config = {
-      cm: {
-        type: CM_TOOL_BASH,
+      bake: {
         source: CM_SOURCE_DIRECTORY
       }
     }
     this.config.defaults(default_config);
 
-/*
-    loadConfig: function() {
-      var configFound = this.baseName !== undefined && this.applicationType !== undefined;
-      if (configFound) {
-        this.existingProject = true;
-      }
+    var configFound = this.baseName !== undefined && this.applicationType !== undefined;
+    if (configFound) {
+      this.existingProject = true;
     }
- */
   },
 
   default: {
@@ -76,33 +66,26 @@ var BakeryGenerator = yeoman.Base.extend({
       'Welcome to the super-excellent ' + chalk.red('bakery') + ' generator!'
     ));
 
-    let cm = this.config.get('cm');
+    let cm = this.config.get('bake');
 
-    var prompts = [{
+    let prompts = [{
       name: "projectname",
       type: "input",
       message: "Project name",
       when: function() { this.projectname == undefined },
       default: this.config.get('projectname')
-    },{
-      name: "type",
-      type: "list",
-      choices: CM_TOOLS,
-      message: "Choose a configuration managment tool",
-      default: cm.type
     },
     {
       name: "source",
       type: "list",
       choices: CM_SOURCES,
-      message: "Choose a source configuration management template",
+      message: "Choose source of configuration management code",
       default: cm.source
     }];
 
     return this.prompt(prompts).then(function(props) {
       let bake_conf = {
         projectname: props.projectname,
-        type: props.type,
         source: props.source
       };
       this.config.set('bake', bake_conf);
@@ -111,14 +94,14 @@ var BakeryGenerator = yeoman.Base.extend({
       let args = { arguments: [props.projectname || this.projectname]};
 
       switch(props.source) {
-        case CM_SOURCE_DIRECTORY:
+        case CM_SOURCE_GENERATE:
           this.composeWith('bakery:cm', args, {});
           break;
         case CM_SOURCE_FORK:
           this.composeWith('bakery:cm-source-fork');
           break;
-        case CM_SOURCE_GENERATE:
-          this.composeWith('bakery:cm-source-generate');
+        case CM_SOURCE_DIRECTORY:
+          this.composeWith('bakery:cm-source-local');
           break;
       }
       this.composeWith('bakery:scm', args, {});

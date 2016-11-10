@@ -8,7 +8,8 @@ const yeoman = require('yeoman-generator'),
   debug = require('debug')('bakery:generators:scm:index'),
   _ = require('lodash');
 
-const SCM_TOOLS = ['github', 'github-enterprise'];
+const SCM_TOOL_GITHUB = 'github';
+const SCM_TOOLS = [ SCM_TOOL_GITHUB ];
 
 var BakeryCI = yeoman.Base.extend({
 
@@ -16,32 +17,30 @@ var BakeryCI = yeoman.Base.extend({
     yeoman.Base.apply(this, arguments);
 
     this._options.help.desc = 'Show this help';
+  },
 
-    /** @property {object} answers - prompt answers */
-    this.answers = {};
-
-    this.argument('projectname', {
-      type: String,
-      required: true
-    });
-
-    this.option('awsprofile', {
-      type: String,
-      alias: 'p',
-      desc: 'Name of the AWS profile to use when calling the AWS api for value validation',
-      default: 'default'
-    });
+  initiliazing: function () {
+    let default_config = {
+      scm: {
+        active: true,
+        scmtool: SCM_TOOL_GITHUB,
+        scmhost: 'github.com'
+      }
+    }
+    this.config.defaults(default_config);
   },
 
   prompting: function() {
 
     this.log(bakery.banner('Project Setup!'));
 
+    let scmInfo = this.config.get('scm');
+
     var prompts = [{
       type: "confirm",
       name: "createscm",
       message: "Attempt to create Source Control repository?",
-      default: this.config.get('createscm') || true
+      default: scmInfo.active
     }, {
       type: "list",
       name: "scmtool",
@@ -50,16 +49,24 @@ var BakeryCI = yeoman.Base.extend({
       when: function(response) {
         return response.createscm;
       },
-      default: this.config.get('scmtool') || SCM_TOOLS[0]
+      default: scmInfo.scmtool
     }, {
       type: "input",
-      name: "scmurl",
+      name: "scmhost",
       message: "Source Control Management hostname:",
       when: function(response) {
         return yeoman.createscm != true;
       },
-      default: this.config.get('scmurl') || ""
-    }];
+      default: scmInfo.scmhost
+    }, {
+      type: "input",
+      name: "organization",
+      message: "Organization:",
+      when: function(response) {
+        return yeoman.createscm != true;
+      },
+      default: scmInfo.scmhost
+    ];
 
     return this.prompt(prompts).then(function(props) {
       this.answers = props;
