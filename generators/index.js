@@ -26,7 +26,8 @@ var BakeryGenerator = yeoman.Base.extend({
 
     this.argument('projectname', {
       type: String,
-      required: false
+      required: false,
+      defaults: ''
     });
 
     this.option('awsprofile', {
@@ -50,6 +51,14 @@ var BakeryGenerator = yeoman.Base.extend({
     }
   },
 
+<<<<<<< HEAD
+=======
+  default: {
+    function() {
+    },
+  },
+
+>>>>>>> cf5cf57... fix projectname argument handling
   prompting: function() {
     process.env.AWS_PROFILE = this.options.awsprofile;
     // Have Yeoman greet the user.
@@ -61,7 +70,7 @@ var BakeryGenerator = yeoman.Base.extend({
       name: "projectname",
       type: "input",
       message: "Project name",
-      when: function() { this.projectname == undefined },
+      when: () => { return (this.projectname.length < 1); },
       default: this.config.get('projectname'),
       required: true
     },
@@ -75,7 +84,7 @@ var BakeryGenerator = yeoman.Base.extend({
     }];
 
     return this.prompt(prompts).then(function(props) {
-      this.config.set('projectname', props.projectname || this.projectname);
+      this.config.set('projectname', props.projectname || this.config.get('projectname'));
       this.config.set('source', props.source);
       this.config.save();
 
