@@ -24,7 +24,8 @@ const LICENSES = ['Proprietary - All Rights Reserved', 'Apache v2.0', 'GPL v3', 
     'Gemfile',
     'metadata.rb',
     'packer_variables.json',
-    'README.md'
+    'README.md',
+    'with_zero.rb'
   ],
   PUPPET_FILELIST = [
     'hiera/hiera.yml',
@@ -68,19 +69,22 @@ var BakeryCM = yeoman.Base.extend({
   prompting: function() {
     this.log(bakery.banner('Configuration Management!'));
     var userInfo = github.getGitUser() || {};
-    var prompts = [{
+    var prompts = [
+    {
       type: 'list',
       name: 'license',
       message: 'Choose a license to apply to the new project:',
       choices: LICENSES,
       required: true
-    }, {
+    },
+    {
       type: "list",
       name: "cmtool",
       message: "Configuration Management (CM) tool:",
       choices: CM_TOOLS,
       required: true
-    }, {
+    },
+    {
       type: 'input',
       name: 'authorname',
       message: "Enter the author's full name or organization:",
@@ -111,12 +115,23 @@ var BakeryCM = yeoman.Base.extend({
       name: 'sourceurl',
       message: 'Enter the source URL:',
       required: true
-    }, {
+    },
+    {
       type: 'input',
       name: 'initialversion',
       message: 'Initial version for package:',
       default: '0.1.0'
-    }, {
+    },
+    {
+      type: 'input',
+      name: 'run_list',
+      message: 'Enter a run list',
+      default: 'recipe[sample_cookbook]',
+      when: function(response) {
+        return response.cmtool == 'chef';
+      }
+    },
+    {
       type: 'input',
       name: 'projecturl',
       message: 'Enter the project URL for this module:',
@@ -160,7 +175,6 @@ var BakeryCM = yeoman.Base.extend({
       year: new Date().getFullYear()
     };
 
-
     var fileList = [];
     switch (process.env.CM_TYPE) {
       case 'puppet':
@@ -175,6 +189,47 @@ var BakeryCM = yeoman.Base.extend({
         feedback.warn('CM tool ' + process.env.CM_TYPE + ' is not yet implemented. Ignoring CM setup');
         break;
     };
+
+    // this was previously in the bake block but had to do with provisioners.
+    // --------------------------------------------------------
+    // --------------------------------------------------------
+    // packerDictionary.provisioners[0] = {}
+    // var osType = 'unix';
+    // if (process.env.WINDOWSIMAGE || this.options.iswindows) {
+    //   osType = 'windows';
+    // };
+    //
+    // switch (process.env.CM_TYPE) {
+    //   case 'chef':
+    //     packerDictionary.provisioners[0]['type'] = 'chef-solo';
+    //     packerDictionary.provisioners[0]['cookbook_paths'] = ['../'];
+    //     packerDictionary.provisioners[0]['guest_os_type'] = osType;
+    //     break;
+    //   case 'puppet':
+    //     packerDictionary.provisioners[0]['type'] = 'puppet-masterless';
+    //     packerDictionary.provisioners[0]['manifest_file'] = 'manifests/';
+    //     primarpackerDictionary.provisioners[0]['hiera_config_path'] = 'hiera.yaml';
+    //     packerDictionary.provisioners[0]['module_paths'] = 'modules/';
+    //     break;
+    //   default:
+    //     feedback.warn('CM Toolset ' + process.env.CM_TYPE + ' is not currently supported or available.');
+    //     break;
+    // }
+    //
+    // this.fs.writeJSON('packer.json', packerDictionary);
+    // --------------------------------------------------------
+    // --------------------------------------------------------
+
+    var packer_options = {
+      run_list: this.answers.run_list,
+    };
+
+    var provisioner_json = this.fs.readJSON(this.templatePath('chef_provisioner.json'));
+    // var provisioner_json = this.fs.readJSON('/Users/johnramos/datapipe-git/yeoman/generator-bakery/generators/cm/templates/chef/chef_provisioner.json');
+    var execute_command = 'cd /opt/chef/cookbooks/cookbooks-0 && sudo chef-client -z -o ' + packer_options.run_list + ' -c ../solo.rb';
+    provisioner_json.provisioners[0].execute_command = execute_command
+    this.fs.extendJSON(this.destinationPath('packer.json'), provisioner_json);
+
     _.forEach(fileList, function(file) {
       this.fs.copyTpl(
         this.templatePath(file),
