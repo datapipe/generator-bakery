@@ -9,11 +9,6 @@ const yeoman = require('yeoman-generator'),
   path = require('path'),
   _ = require('lodash');
 
-const CM_SOURCE_DIRECTORY = 'Local Directory';
-const CM_SOURCE_FORK = 'Fork From SCM';
-const CM_SOURCE_GENERATE = 'Use Generator'
-const CM_SOURCES = [ CM_SOURCE_DIRECTORY, CM_SOURCE_FORK, CM_SOURCE_GENERATE ];
-
 var BakeryGenerator = yeoman.Base.extend({
 
   constructor: function() {
@@ -26,7 +21,8 @@ var BakeryGenerator = yeoman.Base.extend({
 
     this.argument('projectname', {
       type: String,
-      required: false
+      required: false,
+      defaults: ''
     });
 
     this.option('awsprofile', {
@@ -39,7 +35,6 @@ var BakeryGenerator = yeoman.Base.extend({
 
   initializing: function() {
     let default_config = {
-      source: CM_SOURCE_DIRECTORY,
       projectname: this.projectname
     }
     this.config.defaults(default_config);
@@ -70,38 +65,18 @@ var BakeryGenerator = yeoman.Base.extend({
       name: "projectname",
       type: "input",
       message: "Project name",
-      when: function() { this.projectname == undefined },
+      when: () => { return (this.projectname.length < 1); },
       default: this.config.get('projectname'),
-      required: true
-    },
-    {
-      name: "source",
-      type: "list",
-      choices: CM_SOURCES,
-      message: "Choose source of configuration management code",
-      default: this.config.get('source'),
       required: true
     }];
 
     return this.prompt(prompts).then(function(props) {
-      this.config.set('projectname', props.projectname || this.projectname);
-      this.config.set('source', props.source);
+      this.config.set('projectname', props.projectname || this.config.get('projectname'));
       this.config.save();
 
       let projectname = this.config.get('projectname');
       let args = { arguments: [ projectname ] };
-
-      switch(props.source) {
-        case CM_SOURCE_GENERATE:
-          this.composeWith('bakery:cm', args);
-          break;
-        case CM_SOURCE_FORK:
-          this.composeWith('bakery:cm-source-fork');
-          break;
-        case CM_SOURCE_DIRECTORY:
-          this.composeWith('bakery:cm-source-local');
-          break;
-      }
+      this.composeWith('bakery:cm', args);
       this.composeWith('bakery:scm');
       this.composeWith('bakery:ci');
 
