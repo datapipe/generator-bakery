@@ -292,6 +292,14 @@ var BakeryBake = yeoman.Base.extend({
 
     var bake_json = this.fs.readJSON(this.templatePath('packer.json'));
 
+    if (typeof bake_json == 'undefined' || bake_json == null) {
+      bake_json = {};
+    }
+
+    if (!('builders' in bake_json) || bake_json.builders.length == 0) {
+      bake_json.builders = [{}];
+    }
+
     // creates the builder block
     bake_json.builders[0].region = bakeInfo.primaryregion;
     bake_json.builders[0].source_ami = bakeInfo.regionspecificami;
