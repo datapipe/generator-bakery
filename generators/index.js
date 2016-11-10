@@ -12,7 +12,7 @@ const yeoman = require('yeoman-generator'),
 const CM_SOURCE_DIRECTORY = 'Local Directory';
 const CM_SOURCE_FORK = 'Fork From SCM';
 const CM_SOURCE_GENERATE = 'Use Generator'
-const CM_SOURCES = [ CM_SOURCE_DIRECTORY, CM_SOURCE_FORK, CM_SOURCE_GENERATE ];
+const CM_SOURCES = [  CM_SOURCE_GENERATE, CM_SOURCE_DIRECTORY, CM_SOURCE_FORK ];
 
 var BakeryGenerator = yeoman.Base.extend({
 
@@ -96,10 +96,10 @@ var BakeryGenerator = yeoman.Base.extend({
           this.composeWith('bakery:cm', args);
           break;
         case CM_SOURCE_FORK:
-          this.composeWith('bakery:cm-source-fork');
+          this.composeWith('bakery:cm-fork');
           break;
         case CM_SOURCE_DIRECTORY:
-          this.composeWith('bakery:cm-source-local');
+          this.composeWith('bakery:cm-local');
           break;
       }
       this.composeWith('bakery:scm');

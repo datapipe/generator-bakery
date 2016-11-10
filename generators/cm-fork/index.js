@@ -1,11 +1,14 @@
 'use strict';
 const yeoman = require('yeoman-generator'),
+  bakery = require('../../lib/bakery'),
   chalk = require('chalk'),
   yosay = require('yosay'),
   github = require('../../lib/github'),
   feedback = require('../../lib/feedback'),
-  debug = require('debug')('bakery:generators:cm-source-fork:index');
+  debug = require('debug')('bakery:generators:cm-fork:index');
 
+const SCM_TOOL_GITHUB = 'github';
+const SCM_TOOLS = [ SCM_TOOL_GITHUB ];
 
 var BakeryCM = yeoman.Base.extend({
 
@@ -13,27 +16,21 @@ var BakeryCM = yeoman.Base.extend({
     yeoman.Base.apply(this, arguments);
 
     this._options.help.desc = 'Show this help';
-
-    var gitUser = github.getGitUser();
-    this.user = gitUser || {};
   },
 
   initializing: function() {
-    var userInfo = github.getGitUser() || {};
     let gen_defaults = {
-      'cm-source-fork': {
-        type: SCM_TOOLS_GITHUB,
+      'cm-fork': {
+        type: SCM_TOOL_GITHUB,
         hostname: 'github.com'
       }
     }
 
     this.config.defaults(gen_defaults);
-    console.log(this.config.getAll());
   },
 
   prompting: function() {
-    this.log(bakery.banner('Configure SCM Source!'));
-    var cmInfo = this.config.get('cm-source-fork');
+    var cmInfo = this.config.get('cm-fork');
     var prompts = [{
       type: 'list',
       name: 'type',
@@ -75,14 +72,10 @@ var BakeryCM = yeoman.Base.extend({
         oauthToken: props.oauthToken
       };
 
-      this.config.set('cm-source-fork', fork_config);
+      this.config.set('cm-fork', fork_config);
       this.config.save();
 
     }.bind(this));
-  },
-
-  writing: function() {
-    console.log('source from fork not implemented yet');
   }
 
 });
