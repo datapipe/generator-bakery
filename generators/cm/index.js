@@ -70,13 +70,13 @@ var BakeryCM = yeoman.Base.extend({
     this.log(bakery.banner('Configuration Management!'));
     var userInfo = github.getGitUser() || {};
     var prompts = [
-    // {
-    //   type: 'list',
-    //   name: 'license',
-    //   message: 'Choose a license to apply to the new project:',
-    //   choices: LICENSES,
-    //   required: true
-    // },
+    {
+      type: 'list',
+      name: 'license',
+      message: 'Choose a license to apply to the new project:',
+      choices: LICENSES,
+      required: true
+    },
     {
       type: "list",
       name: "cmtool",
@@ -84,38 +84,38 @@ var BakeryCM = yeoman.Base.extend({
       choices: CM_TOOLS,
       required: true
     },
-    // {
-    //   type: 'input',
-    //   name: 'authorname',
-    //   message: "Enter the author's full name or organization:",
-    //   default: userInfo.name,
-    //   required: true
-    // }, {
-    //   type: 'input',
-    //   name: 'authoremail',
-    //   message: "Enter the author or organization's email:",
-    //   default: userInfo.email
-    // }, {
-    //   type: 'input',
-    //   name: 'shortdescription',
-    //   message: 'Enter a short description of the project:',
-    //   required: true
-    // }, {
-    //   type: 'input',
-    //   name: 'longdescription',
-    //   message: 'Enter a long description of the project:',
-    //   required: true
-    // }, {
-    //   type: 'input',
-    //   name: 'issuesurl',
-    //   message: 'Enter the issues URL:',
-    //   required: true
-    // }, {
-    //   type: 'input',
-    //   name: 'sourceurl',
-    //   message: 'Enter the source URL:',
-    //   required: true
-    // },
+    {
+      type: 'input',
+      name: 'authorname',
+      message: "Enter the author's full name or organization:",
+      default: userInfo.name,
+      required: true
+    }, {
+      type: 'input',
+      name: 'authoremail',
+      message: "Enter the author or organization's email:",
+      default: userInfo.email
+    }, {
+      type: 'input',
+      name: 'shortdescription',
+      message: 'Enter a short description of the project:',
+      required: true
+    }, {
+      type: 'input',
+      name: 'longdescription',
+      message: 'Enter a long description of the project:',
+      required: true
+    }, {
+      type: 'input',
+      name: 'issuesurl',
+      message: 'Enter the issues URL:',
+      required: true
+    }, {
+      type: 'input',
+      name: 'sourceurl',
+      message: 'Enter the source URL:',
+      required: true
+    },
     {
       type: 'input',
       name: 'initialversion',
