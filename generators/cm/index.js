@@ -25,7 +25,8 @@ const LICENSES = ['Proprietary - All Rights Reserved', 'Apache v2.0', 'GPL v3', 
     'metadata.rb',
     'packer_variables.json',
     'README.md',
-    'with_zero.rb'
+    'with_zero.rb',
+    'install_cookbooks.sh'
   ],
   PUPPET_FILELIST = [
     'hiera/hiera.yml',
@@ -237,8 +238,9 @@ var BakeryCM = yeoman.Base.extend({
     };
 
     var provisioner_json = this.fs.readJSON(this.templatePath('chef_provisioner.json'));
-    // var provisioner_json = this.fs.readJSON('/Users/johnramos/datapipe-git/yeoman/generator-bakery/generators/cm/templates/chef/chef_provisioner.json');
-    var execute_command = 'cd /opt/chef/cookbooks/cookbooks-0 && sudo chef-client -z -o ' + packer_options.run_list + ' -c ../solo.rb';
+    // var execute_command = 'cd /opt/chef/cookbooks/cookbooks-0 && sudo chef-client -z -o ' + packer_options.run_list + ' -c ../solo.rb';
+    // we're going to default to a specific runlist for now.
+    var execute_command = 'cd /opt/chef/cookbooks/cookbooks-0 && sudo chef-client -z -o recipe[onerun::default] -c ../solo.rb';
     provisioner_json.provisioners[0].execute_command = execute_command
     this.fs.extendJSON(this.destinationPath('packer.json'), provisioner_json);
 
@@ -252,7 +254,7 @@ var BakeryCM = yeoman.Base.extend({
   },
 
   install: function() {
-    this.installDependencies();
+    this.spawnCommand('./install_cookbooks.sh');
   }
 });
 
