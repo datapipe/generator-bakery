@@ -33,6 +33,46 @@ yo bakery <project_name>
 
 ## General workflow
 
+### Source Control Management
+
+One of the key points of this solution is that we must manage how we build AMI's both in a central place but also in a way that allows us to:
+
+* View history
+* Provide Peer Review
+* Manage collaborative work between multiple engineers in the same structure
+
+Therefore, we've baked in the idea of utilizing a source code repository as the storage medium for these projects by default. We initially are supporting both [Github](https://github.com) and [Github Enterprise](https://enterprise.github.com/home).
+
+### Configuration Management
+
+Overall, we support the following means of applying configuration to machines when building images:
+
+* [Chef](http://chef.io)
+* [Puppet](http://puppetlabs.com)
+* Bash Scripts (^nix support)
+* Powershell Scripts (Windows Support)
+
+We're using this project to create repositories containing code intended to build an AMI in AWS. This means that we're targeting a specific OS and a specific usecase, application or purpose. We also fully believe that we shouldn't reinvent the wheel, so we're heavily leveraging tooling from the open source community and providing options that should offer the majority of users a path forward.
+
+That being said, since this is a focused usecase, especially when it comes to concepts such as configuration management tooling, while they do support multiple operating systems, our goal is to use Chef and Puppet more as a way to compose other components from their respective communities. While not a 'pure' implementation of the tools, we tend to make assumptions around OS-specfic environments that we wouldn't otherwise make in more generally-focused components.
+
+For more basic configurations, using direct scripting either via bash or PowerShell, the tooling expects that each script logs data to STDOUT and error information to STDERR while still respecting the exit code for success or failure overall. Non-zero exit codes are interpreted as failures and will stop an image build.
+
+### Image Management
+
+We're using [Packer](http://packer.io) to collect and apply our configuration assets before creating an image in AWS. The setup and configuration of this respects the Configuration Management options selected and, unlike other parts of this solution, the packer file itself is dynamically generated vs. being driven through a template.
+
+These scripts are designed to be used with a single configuration management tool to start, though manual editing post-generation could certainly achieve a multi-tool based approach. More information on how to format this script is available within [Packer's documentation](https://www.packer.io/docs):
+
+* [Shell Provisioner](https://www.packer.io/docs/provisioners/shell.html)
+* [Powershell Provisioner](https://www.packer.io/docs/provisioners/powershell.html)
+  * [Windows Restart](https://www.packer.io/docs/provisioners/windows-restart.html)
+* [Chef Solo](https://www.packer.io/docs/provisioners/chef-solo.html)
+* [Puppet Masterless](https://www.packer.io/docs/provisioners/puppet-masterless.html)
+* [File Uploads](https://www.packer.io/docs/provisioners/file.html)
+
+### Screenshot Walkthrough
+
 ![welcome!](docs/images/welcomescreen.png)
 
 ![Source Control Management](docs/images/scmscreen.png)
@@ -46,7 +86,6 @@ yo bakery <project_name>
 ![Select Multiple Regions](docs/images/selectmultipleregionsscreen.png)
 
 ![Select Primary Region](docs/images/primaryregionscreen.png)
-
 
 
 ## License
