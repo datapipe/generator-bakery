@@ -2,7 +2,7 @@
 
 var assert = require('assert'),
     expect = require('chai').expect,
-    //github = require('../lib/github.js'),
+    github_lib = require('../lib/github.js'),
     _ = require('underscore'),
     fs = require('fs-extra'),
     Client = require('node-rest-client').Client,
@@ -11,7 +11,7 @@ var assert = require('assert'),
     Github = require('../lib/github.js').Github;
 
 // options hash for calls to github library
-var repo_opts = {
+let repo_opts = {
   accessToken: process.env.GITHUB_API_ACCESS_TOKEN,
   hostname: process.env.GITHUB_HOSTNAME,
   username: process.env.GITHUB_USER,
@@ -25,12 +25,13 @@ repo_opts.hostname || assert.fail("GITHUB_HOSTNAME must be defined for testing")
 repo_opts.username || assert.fail("GITHUB_USER must be defined for testing")
 repo_opts.org || assert.fail("GITHUB_ORG must be defined for testing")
 
+let credentials = {
+  type: 'accessToken',
+  accessToken: repo_opts.accessToken
+}
+let github = new Github(repo_opts.username, repo_opts.hostname, credentials);
+
 describe('new Github class', function() {
-  let credentials = {
-    type: 'accessToken',
-    accessToken: repo_opts.accessToken
-  }
-  let github = new Github(repo_opts.username, repo_opts.hostname, credentials);
 
   it('gets User Info', function(done) {
     return github.getUserInfo()
@@ -89,14 +90,8 @@ describe('new Github class', function() {
 
 });
 
-describe("GitHub.local", function() {
+describe("local working directory actions", function() {
   this.timeout(10000);
-  let credentials = {
-    type: 'accessToken',
-    accessToken: repo_opts.accessToken
-  }
-  let github = new Github(repo_opts.username, repo_opts.hostname, credentials);
-  let failed = false;
 
   let tmpDir = "/tmp/github_test";
   let repo = tmpDir + "/repo";
@@ -179,5 +174,68 @@ describe("GitHub.local", function() {
         });
       });
   });
+});
 
+describe("full workflow", function() {
+  let tmpDir = "/tmp/github_workflow_test";
+  let repo = tmpDir + "/repo";
+  let notARepo = tmpDir + "/notarepo";
+  let repofile = "README.md";
+
+  // setup a local repo directory and a non-repo directory
+  before(function() {
+    fs.ensureDirSync(repo);
+    fs.writeFileSync(repo + "/" + repofile, "# TESTING", err => { assert.fail(err); });
+  });
+
+  // init repository
+  before(function() {
+    return exec('git init', {cwd: repo});
+  });
+
+  // add a file to the repo
+  before(function() {
+    return exec('git add README.md', {cwd: repo});
+  });
+
+  // add a file to the repo
+  before(function() {
+    return exec('git commit -m "initial commit"', {cwd: repo})
+  });
+
+  after(function() {
+    return github.deleteRepo(repo_opts.username, 'lib_github_test_repo');
+  });
+
+  // clean up local repo and remove remote git repos
+  after(function() {
+    let newHome = tmpDir + '.bak';
+    fs.move(tmpDir, newHome, { clobber: true }, err => {
+      if (err) return console.error(err);
+    });
+  });
+
+  it("creates a repo", function() {
+    this.timeout(30000);
+    let reponame = 'lib_github_test_repo';
+    let remoteUrl = [
+      "https://" + repo_opts.hostname,
+      repo_opts.username,
+      reponame].join('/');
+
+    return github.createUserRepository(reponame, 'this is just a test')
+      .then(repository => {
+        return github.setOrigin(repo, remoteUrl);
+      })
+      .then(remote => {
+        return github.push(repo);
+      })
+      .then(remote => {
+        return github.clone(repo_opts.username, reponame, notARepo);
+      })
+      .then(repo => {
+        assert(fs.existsSync(notARepo + "/README.md"));
+        return Promise.resolve(repo);
+      });
+  });
 });
