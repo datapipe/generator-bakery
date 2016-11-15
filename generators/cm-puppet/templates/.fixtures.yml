@@ -1,0 +1,6 @@
+fixtures:
+  repositories:
+    stdlib:  "git@github.com:puppetlabs/puppetlabs-stdlib.git"
+    staging: "git@github.com:nanliu/puppet-staging.git"
+  symlinks:
+    besagent: "#{source_dir}"

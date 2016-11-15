@@ -1,0 +1,10 @@
+source 'https://rubygems.org'
+
+gem 'test-kitchen'
+gem 'kitchen-vagrant'
+gem 'ffi'
+gem 'vagrant-berkshelf'
+gem 'winrm'
+gem 'winrm-fs'
+gem 'kitchen-inspec'
+gem 'berkshelf'
