@@ -87,6 +87,8 @@ These scripts are designed to be used with a single configuration management too
 
 ![Select Primary Region](docs/images/primaryregionscreen.png)
 
+## Testing
+Tests should be written in the test/ directory. Currently gulp is configured to run [Mocha](https://mochajs.org/) tests. Tests can be run with the command ```gulp test```. For convenience a testing.sh.example file is provided in the top level directory. This is a template which shows environment variables which should be set (containing things like AWS and Git credentials) to run the tests.
 
 ## License
 
