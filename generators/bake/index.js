@@ -193,8 +193,10 @@ var BakeryBake = yeoman.Base.extend({
           }).then(function(successful) {
             return successful;
           }, function(err) {
+            feedback.warn("error while looking up AMI: " + err.message);
             return false;
           }).catch(err => {
+            feedback.warn("error while looking up AMI: " + err.message);
             return false;
           });
         }
