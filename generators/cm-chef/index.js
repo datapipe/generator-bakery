@@ -9,8 +9,7 @@ const yeoman = require('yeoman-generator'),
   path = require('path'),
   _ = require('lodash');
 
-const LICENSES = ['Proprietary - All Rights Reserved', 'Apache v2.0', 'GPL v3', 'MIT', 'ISC'],
-  FILELIST = [
+const FILELIST = [
     'recipes/default.rb',
     'spec/unit/recipes/default_spec.rb',
     'spec/spec_helper.rb',
@@ -41,7 +40,6 @@ var BakeryCM = yeoman.Base.extend({
   },
 
   initializing: function() {
-    var userInfo = github.getGitUser() || {};
     let gen_defaults = {
       'cm-chef': {
       }

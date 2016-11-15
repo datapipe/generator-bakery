@@ -1,9 +1,12 @@
 'use strict';
 const yeoman = require('yeoman-generator'),
+  bakery = require('../../lib/bakery'),
   feedback = require('../../lib/feedback'),
   debug = require('debug')('bakery:generators:cm:index');
 
-const CM_TOOL_CHEF = 'Chef Zero',
+const LICENSES = ['Proprietary - All Rights Reserved', 'Apache v2.0', 'GPL v3', 'MIT', 'ISC'],
+
+      CM_TOOL_CHEF = 'Chef Zero',
       CM_TOOL_PUPPET = 'Masterless Puppet',
       CM_TOOL_POWERSHELL = 'Powershell (Windows Only)',
       CM_TOOL_BASH = 'BASH (Linux Only)',
@@ -18,16 +21,14 @@ var BakeryCM = yeoman.Base.extend({
   },
 
   initializing: function() {
-    var userInfo = github.getGitUser() || {};
     let gen_defaults = {
       cm: {
         tool: CM_TOOL_CHEF,
         license: LICENSES[0],
         cmtool: CM_TOOLS[0],
-        authorname: userInfo.name,
-        authoremail: userInfo.email,
         initialversion: '0.1.0'
-    }
+      }
+    };
 
     this.config.defaults(gen_defaults);
   },
@@ -35,9 +36,9 @@ var BakeryCM = yeoman.Base.extend({
   prompting: function() {
     this.log(bakery.banner('Configuration Management!'));
     var cmInfo = this.config.get('cm');
-    var prompts = [,
+    var prompts = [
     {
-      name: "type",
+      name: "tool",
       type: "list",
       choices: CM_TOOLS,
       message: "Choose configuration managment project type",
@@ -94,24 +95,24 @@ var BakeryCM = yeoman.Base.extend({
 
     return this.prompt(prompts).then(function(props) {
       let cmInfo = {
-        type: props.type,
+        tool: props.tool,
         license: props.license,
-        authorname: cmInfo.authorname,
-        authoremail: cmInfo.authoremail,
-        shortdescription: cmInfo.shortdescription,
-        longdescription: cmInfo.longdescription,
-        sourceurl: cmInfo.sourceurl,
-        issuesurl: cmInfo.issuesurl,
-        initialversion: cmInfo.initialversion
+        authorname: props.authorname,
+        authoremail: props.authoremail,
+        shortdescription: props.shortdescription,
+        longdescription: props.longdescription,
+        sourceurl: props.sourceurl,
+        issuesurl: props.issuesurl,
+        initialversion: props.initialversion
       };
 
-      this.config.set('cm', props.source);
+      this.config.set('cm', cmInfo);
       this.config.save();
 
       let projectname = this.config.get('projectname');
       let args = { arguments: [ projectname ] };
 
-      switch(props.source) {
+      switch(props.tool) {
         case CM_TOOL_CHEF:
           this.composeWith('bakery:cm-chef', args);
           break;
