@@ -10,7 +10,12 @@ const LICENSES = ['Proprietary - All Rights Reserved', 'Apache v2.0', 'GPL v3', 
       CM_TOOL_PUPPET = 'Masterless Puppet',
       CM_TOOL_POWERSHELL = 'Powershell (Windows Only)',
       CM_TOOL_BASH = 'BASH (Linux Only)',
-      CM_TOOLS = [ CM_TOOL_CHEF, CM_TOOL_PUPPET, CM_TOOL_POWERSHELL, CM_TOOL_BASH ];
+      CM_TOOLS = [ CM_TOOL_CHEF, CM_TOOL_PUPPET, CM_TOOL_POWERSHELL, CM_TOOL_BASH ],
+      CM_GEN_CHEF = 'cm-chef',
+      CM_GEN_PUPPET = 'cm-puppet',
+      CM_GEN_POWERSHELL = 'cm-powershell',
+      CM_GEN_BASH = 'cm-bash',
+      CM_GENS = [ CM_GEN_CHEF, CM_GEN_PUPPET, CM_GEN_POWERSHELL, CM_GEN_BASH ];
 
 var BakeryCM = yeoman.Base.extend({
 
@@ -24,6 +29,7 @@ var BakeryCM = yeoman.Base.extend({
     let gen_defaults = {
       cm: {
         tool: CM_TOOL_CHEF,
+        generatorName: CM_GEN_CHEF,
         license: LICENSES[0],
         cmtool: CM_TOOLS[0],
         initialversion: '0.1.0'
@@ -106,27 +112,28 @@ var BakeryCM = yeoman.Base.extend({
         initialversion: props.initialversion
       };
 
-      this.config.set('cm', cmInfo);
-      this.config.save();
-
-      let projectname = this.config.get('projectname');
-      let args = { arguments: [ projectname ] };
-
-      switch(props.tool) {
+      switch(cmInfo.tool) {
         case CM_TOOL_CHEF:
-          this.composeWith('bakery:cm-chef', args);
+          cmInfo.generatorName = CM_GEN_CHEF;
           break;
         case CM_TOOL_PUPPET:
-          this.composeWith('bakery:cm-puppet', args);
+          cmInfo.generatorName = CM_GEN_PUPPET;
           break;
         case CM_TOOL_POWERSHELL:
-          this.composeWith('bakery:cm-powershell', args);
+          cmInfo.generatorName = CM_GEN_POWERSHELL;
           break;
         case CM_TOOL_BASH:
-          this.composeWith('bakery:cm-bash', args);
+          cmInfo.generatorName = CM_GEN_BASH;
           break;
       }
+
+      this.config.set('cm', cmInfo);
+      this.config.save();
     }.bind(this));
+  },
+
+  writing: function() {
+    feedback.info("cm is writing");
   }
 });
 

@@ -40,6 +40,9 @@ var BakeryCM = yeoman.Base.extend({
   },
 
   initializing: function() {
+    let cmInfo = this.config.get('cm');
+    if (cmInfo.generatorName != 'cm-chef') return;
+
     let gen_defaults = {
       'cm-chef': {
       }
@@ -50,6 +53,9 @@ var BakeryCM = yeoman.Base.extend({
 
   writing: function() {
     let cmInfo = this.config.get('cm');
+    if (cmInfo.generatorName != 'cm-chef') return;
+
+    feedback.info("cm-chef is writing");
     var replacements = {
       license: cmInfo.license,
       project_name: this.config.get('bake').projectname,

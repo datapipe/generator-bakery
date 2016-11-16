@@ -48,13 +48,15 @@ var BakeryCM = yeoman.Base.extend({
   },
 
   prompting: function() {
-    this.log(bakery.banner('Puppet CM Project'));
     var puppetInfo = this.config.get('cm-puppet');
     var prompts = [{
       type: 'input',
       name: 'projecturl',
       message: 'Enter the project URL for this module:',
-      default: puppetInfo.projecturl
+      default: puppetInfo.projecturl,
+      when: () => {
+        return (this.config.get('cm').cmtool == 'cm-puppet');
+      }
     }];
 
     return this.prompt(prompts).then(function(props) {
@@ -69,6 +71,8 @@ var BakeryCM = yeoman.Base.extend({
 
   writing: function() {
     let cmInfo = this.config.get('cm');
+    if (cmInfo.generatorName != 'cm-puppet') return;
+
     let puppetInfo = this.config.get('cm-puppet');
     var replacements = {
       license: cmInfo.license,

@@ -25,6 +25,13 @@ var BakeryGenerator = yeoman.Base.extend({
       defaults: ''
     });
 
+    this.option('workingdir', {
+      type: String,
+      alias: 'w',
+      desc: 'Identifies a parent directory for the output of this generator',
+      defaults: '/tmp'
+    });
+
     this.option('awsprofile', {
       type: String,
       alias: 'p',
@@ -70,6 +77,10 @@ var BakeryGenerator = yeoman.Base.extend({
       let args = { arguments: [ projectname ] };
 
       this.composeWith('bakery:cm', args);
+      this.composeWith('bakery:cm-chef', args);
+      this.composeWith('bakery:cm-puppet', args);
+      this.composeWith('bakery:cm-powershell', args);
+      this.composeWith('bakery:cm-bash', args);
       this.composeWith('bakery:scm');
       this.composeWith('bakery:ci');
 
@@ -80,13 +91,17 @@ var BakeryGenerator = yeoman.Base.extend({
 
   configuring: function() {
     let projectname = this.config.get('projectname');
-    if (path.basename(this.destinationPath()) !== projectname) {
+    if (path.basename(this.destinationRoot()) !== projectname) {
+      console.log("dir: %s, project: %s", this.options.workingdir, projectname);
+      let projPath = path.join(this.options.workingdir, projectname);
       mkdirp(projectname);
-      this.destinationRoot(this.destinationPath(projectname));
+      this.destinationRoot(projPath);
     }
   },
 
-  writing: function() {},
+  writing: function() {
+    feedback.info("top-level project is writing");
+  },
 
   install: function() {
     this.installDependencies();

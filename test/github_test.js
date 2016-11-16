@@ -29,9 +29,9 @@ let credentials = {
   type: 'accessToken',
   accessToken: repo_opts.accessToken
 }
-let github = new Github(repo_opts.username, repo_opts.hostname, credentials);
+let github = new Github(repo_opts.hostname, credentials);
 
-describe('new Github class', function() {
+describe('Github class remote actions', function() {
 
   it('gets User Info', function(done) {
     return github.getUserInfo()
@@ -90,7 +90,7 @@ describe('new Github class', function() {
 
 });
 
-describe("local working directory actions", function() {
+describe("Github class local working directory actions", function() {
   this.timeout(10000);
 
   let tmpDir = "/tmp/github_test";
