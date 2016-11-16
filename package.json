@@ -20,6 +20,7 @@
     "chalk": "^1.0.0",
     "yosay": "^1.0.0",
     "figlet": "^1.2.0",
+    "fs-extra": "^1.0.0",
     "colors": "^1.1.2",
     "lodash": "^4.15.0",
     "generator-github-create": "^0.5.2",

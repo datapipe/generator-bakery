@@ -60,7 +60,8 @@ var BakeryBake = yeoman.Base.extend({
         active: true,
         aminame: this.projectname + ' {{timestamp}}',
         awsregions: ['us-west-2'],
-        buildimagetype: 't2.large'
+        buildimagetype: 't2.large',
+        regionspecificami: 'ami-c8580bdf'
       }
     }
     this.config.defaults(gen_defaults);
@@ -141,7 +142,7 @@ var BakeryBake = yeoman.Base.extend({
       },
       default: function(response) {
         if (bakeInfo.primaryregion) {
-          return bakeinfo.primaryregion;
+          return bakeInfo.primaryregion;
         } else if (response.awsregions.indexOf('us-west-2') > -1) {
           return 'us-west-2';
         } else {
@@ -177,7 +178,7 @@ var BakeryBake = yeoman.Base.extend({
         message: function(response) {
           return 'AMI ID in ' + bakeInfo.primaryregion + ' region:';
         },
-        default: 'ami-c8580bdf',
+        default: bakeInfo.regionspecificami,
         when: function(response) {
           return bakeInfo.active;
         },
@@ -192,10 +193,10 @@ var BakeryBake = yeoman.Base.extend({
           }).then(function(successful) {
             return successful;
           }, function(err) {
-            console.log("in handler: " + err);
+            feedback.warn("error while looking up AMI: " + err.message);
             return false;
           }).catch(err => {
-            console.log("Could not validate AMI: " + err);
+            feedback.warn("error while looking up AMI: " + err.message);
             return false;
           });
         }

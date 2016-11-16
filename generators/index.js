@@ -63,10 +63,12 @@ var BakeryGenerator = yeoman.Base.extend({
 
     return this.prompt(prompts).then(function(props) {
       this.config.set('projectname', props.projectname || this.config.get('projectname'));
+      this.config.set('source', props.source);
       this.config.save();
 
       let projectname = this.config.get('projectname');
       let args = { arguments: [ projectname ] };
+
       this.composeWith('bakery:cm', args);
       this.composeWith('bakery:scm');
       this.composeWith('bakery:ci');

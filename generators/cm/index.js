@@ -1,47 +1,16 @@
 'use strict';
 const yeoman = require('yeoman-generator'),
-  chalk = require('chalk'),
-  yosay = require('yosay'),
   bakery = require('../../lib/bakery'),
-  github = require('../../lib/github'),
   feedback = require('../../lib/feedback'),
-  debug = require('debug')('bakery:generators:cm:index'),
-  glob = require('glob'),
-  path = require('path'),
-  _ = require('lodash');
+  debug = require('debug')('bakery:generators:cm:index');
 
 const LICENSES = ['Proprietary - All Rights Reserved', 'Apache v2.0', 'GPL v3', 'MIT', 'ISC'],
-  CM_TOOLS = ['chef', 'puppet', 'bash'],
-  CHEF_FILELIST = [
-    'recipes/default.rb',
-    'spec/unit/recipes/default_spec.rb',
-    'spec/spec_helper.rb',
-    'test/recipes/default_spec.rb',
-    '.gitignore',
-    '.kitchen.yml',
-    'Berksfile',
-    'chefignore',
-    'Gemfile',
-    'metadata.rb',
-    'packer_variables.json',
-    'README.md',
-    'with_zero.rb',
-    'install_cookbooks.sh'
-  ],
-  PUPPET_FILELIST = [
-    'hiera/hiera.yml',
-    'manifests/default.pp',
-    'modules/README.md',
-    'spec/classes/init_spec.rb',
-    'spec/spec_helper.rb',
-    '.fixtures.yml',
-    '.gitignore',
-    'Gemfile',
-    'hiera.yaml',
-    'metadata.json',
-    'Rakefile',
-    'README.md'
-  ];
+
+      CM_TOOL_CHEF = 'Chef Zero',
+      CM_TOOL_PUPPET = 'Masterless Puppet',
+      CM_TOOL_POWERSHELL = 'Powershell (Windows Only)',
+      CM_TOOL_BASH = 'BASH (Linux Only)',
+      CM_TOOLS = [ CM_TOOL_CHEF, CM_TOOL_PUPPET, CM_TOOL_POWERSHELL, CM_TOOL_BASH ];
 
 var BakeryCM = yeoman.Base.extend({
 
@@ -49,27 +18,17 @@ var BakeryCM = yeoman.Base.extend({
     yeoman.Base.apply(this, arguments);
 
     this._options.help.desc = 'Show this help';
-
-    this.argument('projectname', {
-      type: String,
-      required: (this.config.get('projectname') == undefined)
-    });
-
-    var gitUser = github.getGitUser();
-    this.user = gitUser || {};
   },
 
   initializing: function() {
-    var userInfo = github.getGitUser() || {};
     let gen_defaults = {
       cm: {
+        tool: CM_TOOL_CHEF,
         license: LICENSES[0],
         cmtool: CM_TOOLS[0],
-        authorname: userInfo.name,
-        authoremail: userInfo.email,
         initialversion: '0.1.0'
       }
-    }
+    };
 
     this.config.defaults(gen_defaults);
   },
@@ -77,20 +36,21 @@ var BakeryCM = yeoman.Base.extend({
   prompting: function() {
     this.log(bakery.banner('Configuration Management!'));
     var cmInfo = this.config.get('cm');
-    var prompts = [{
+    var prompts = [
+    {
+      name: "tool",
+      type: "list",
+      choices: CM_TOOLS,
+      message: "Choose configuration managment project type",
+      default: cmInfo.tool,
+      required: true
+    }, {
       type: 'list',
       name: 'license',
       message: 'Choose a license to apply to the new project:',
       choices: LICENSES,
       required: true,
       default: cmInfo.license
-    }, {
-      type: "list",
-      name: "cmtool",
-      message: "Configuration Management (CM) tool:",
-      choices: CM_TOOLS,
-      required: true,
-      default: cmInfo.cmtool
     }, {
       type: 'input',
       name: 'authorname',
@@ -131,130 +91,42 @@ var BakeryCM = yeoman.Base.extend({
       name: 'initialversion',
       message: 'Initial version for package:',
       default: cmInfo.initialversion
-    }, {
-      type: 'input',
-      name: 'projecturl',
-      message: 'Enter the project URL for this module:',
-      when: function(response) {
-        return response.cmtool == 'puppet';
-      },
-      required: function(response) {
-        return response.cmtool == 'puppet';
-      },
-      default: cmInfo.projecturl
     }];
 
     return this.prompt(prompts).then(function(props) {
-      let gen_config = {
+      let cmInfo = {
+        tool: props.tool,
         license: props.license,
-        cmtool: props.cmtool,
         authorname: props.authorname,
         authoremail: props.authoremail,
         shortdescription: props.shortdescription,
         longdescription: props.longdescription,
-        issuesurl: props.issuesurl,
         sourceurl: props.sourceurl,
-        initialversion: props.initialversion,
-        projecturl: props.projecturl
+        issuesurl: props.issuesurl,
+        initialversion: props.initialversion
       };
-      this.config.set('cm', gen_config);
+
+      this.config.set('cm', cmInfo);
       this.config.save();
 
-      // load to global to share with other components easily
-      process.env.CM_TYPE = props.cmtool;
+      let projectname = this.config.get('projectname');
+      let args = { arguments: [ projectname ] };
+
+      switch(props.tool) {
+        case CM_TOOL_CHEF:
+          this.composeWith('bakery:cm-chef', args);
+          break;
+        case CM_TOOL_PUPPET:
+          this.composeWith('bakery:cm-puppet', args);
+          break;
+        case CM_TOOL_POWERSHELL:
+          this.composeWith('bakery:cm-powershell', args);
+          break;
+        case CM_TOOL_BASH:
+          this.composeWith('bakery:cm-bash', args);
+          break;
+      }
     }.bind(this));
-  },
-
-  default: {
-    /*saveConfig: function() {
-      _.forOwn(this.answers, function(value, key) {
-        this.config.set(key, value);
-      })
-    }*/
-  },
-
-  writing: function() {
-    let cmInfo = this.config.get('cm');
-    var replacements = {
-      license: cmInfo.license,
-      project_name: this.config.get('bake').projectname,
-      author_name: cmInfo.authorname,
-      author_email: cmInfo.authoremail,
-      short_description: cmInfo.shortdescription,
-      long_description: cmInfo.longdescription,
-      source_url: cmInfo.sourceurl,
-      pronect_url: cmInfo.projecturl,
-      issues_url: cmInfo.issuesurl,
-      version: cmInfo.initialversion,
-      year: new Date().getFullYear()
-    };
-
-    var fileList = [];
-    switch (process.env.CM_TYPE) {
-      case 'puppet':
-        this.sourceRoot(__dirname + '/templates/puppet');
-        fileList = PUPPET_FILELIST;
-        break;
-      case 'chef':
-        this.sourceRoot(__dirname + '/templates/chef');
-        fileList = CHEF_FILELIST;
-        break;
-      default:
-        feedback.warn('CM tool ' + process.env.CM_TYPE + ' is not yet implemented. Ignoring CM setup');
-        break;
-    };
-
-    // this was previously in the bake block but had to do with provisioners.
-    // --------------------------------------------------------
-    // --------------------------------------------------------
-    // packerDictionary.provisioners[0] = {}
-    // var osType = 'unix';
-    // if (process.env.WINDOWSIMAGE || this.options.iswindows) {
-    //   osType = 'windows';
-    // };
-    //
-    // switch (process.env.CM_TYPE) {
-    //   case 'chef':
-    //     packerDictionary.provisioners[0]['type'] = 'chef-solo';
-    //     packerDictionary.provisioners[0]['cookbook_paths'] = ['../'];
-    //     packerDictionary.provisioners[0]['guest_os_type'] = osType;
-    //     break;
-    //   case 'puppet':
-    //     packerDictionary.provisioners[0]['type'] = 'puppet-masterless';
-    //     packerDictionary.provisioners[0]['manifest_file'] = 'manifests/';
-    //     primarpackerDictionary.provisioners[0]['hiera_config_path'] = 'hiera.yaml';
-    //     packerDictionary.provisioners[0]['module_paths'] = 'modules/';
-    //     break;
-    //   default:
-    //     feedback.warn('CM Toolset ' + process.env.CM_TYPE + ' is not currently supported or available.');
-    //     break;
-    // }
-    //
-    // this.fs.writeJSON('packer.json', packerDictionary);
-    // --------------------------------------------------------
-    // --------------------------------------------------------
-
-    var packer_options = {
-    };
-
-    var provisioner_json = this.fs.readJSON(this.templatePath('chef_provisioner.json'));
-    // var execute_command = 'cd /opt/chef/cookbooks/cookbooks-0 && sudo chef-client -z -o ' + packer_options.run_list + ' -c ../solo.rb';
-    // we're going to default to a specific runlist for now.
-    var execute_command = 'cd /opt/chef/cookbooks/cookbooks-0 && sudo chef-client -z -o recipe[onerun::default] -c ../solo.rb';
-    provisioner_json.provisioners[0].execute_command = execute_command
-    this.fs.extendJSON(this.destinationPath('packer.json'), provisioner_json);
-
-    _.forEach(fileList, function(file) {
-      this.fs.copyTpl(
-        this.templatePath(file),
-        this.destinationPath(file),
-        replacements
-      );
-    }.bind(this));
-  },
-
-  install: function() {
-    this.spawnCommand('./install_cookbooks.sh');
   }
 });
 
