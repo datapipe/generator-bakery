@@ -18,8 +18,14 @@ var BakeryCI = yeoman.Base.extend({
 
     this._options.help.desc = 'Show this help';
 
+    this.argument('projectname', {
+      type: String,
+      required: (this.config.get('projectname') == undefined)
+    });
+
+    // allow credentials to be set as env variables so they do not need
+    // to be copy/pasted each run
     this.gittoken = process.env.GIT_TOKEN;
-    feedback.info(this.gittoken);
   },
 
   initializing: function() {
@@ -27,14 +33,16 @@ var BakeryCI = yeoman.Base.extend({
       scm: {
         active: true,
         scmtool: SCM_TOOL_GITHUB,
-        scmhost: 'github.com'
+        scmhost: 'github.com',
+        // repo should use projectname by default
+        repository: this.projectname
       }
     }
     this.config.defaults(default_config);
   },
 
   prompting: function() {
-    this.log(bakery.banner('Project Setup!'));
+    this.log(bakery.banner('Source Control Setup!'));
 
     let scmInfo = this.config.get('scm');
     let _org;
@@ -57,11 +65,13 @@ var BakeryCI = yeoman.Base.extend({
     }, {
       type: "input",
       name: "gittoken",
-      message: "Github OAuth token (this will not be saved - set env. var. GIT_TOKEN to skip):",
+      message: "Github OAuth token (this will NOT be saved - set env. var. GIT_TOKEN to skip):",
       when: response => {
         return (response.createscm && !this.gittoken);
       },
       required: true,
+      // no hook is provided for processing prompts individual - hijacking validate(...)
+      //  to store gittoken for use in later prompts
       validate: token => {
         this.gittoken = token;
         return true;
@@ -82,7 +92,7 @@ var BakeryCI = yeoman.Base.extend({
         this.github = new Github(host, credentials);
         return this.github.getUserInfo().then(
           userInfo => {
-            feedback.info("retrieved info for " + userInfo.login);
+            feedback.info("confirmed authentication for " + userInfo.login);
             return true;
           },
           err => {
@@ -94,11 +104,11 @@ var BakeryCI = yeoman.Base.extend({
     }, {
       type: "list",
       name: "organization",
-      message: "Organization to own repository:",
+      message: "Select which organization should own the repository:",
       choices: () => {
+        // obtain the list of organizations this user has access to
         return this.github.getOrganizations()
           .then(orgs => {
-            feedback.info(orgs);
             let choices = [];
             orgs.forEach( org => {
               choices.push(org.login);
@@ -111,6 +121,10 @@ var BakeryCI = yeoman.Base.extend({
       },
       default: scmInfo.organization
     }];
+
+    // props.organization is needed in order to validate the repository (ie. check if it
+    //  already exists). This is the alternate pattern to hijacking 'validate(...' as done
+    //  for 'gittoken' input above.
     return this.prompt(prompts).then(props => {
       return props;
     }).then(props => {
@@ -123,6 +137,7 @@ var BakeryCI = yeoman.Base.extend({
         },
         default: scmInfo.repository,
         validate: repo => {
+          // check if the repo already exists
           return this.github.getRepoInfo(props.organization, repo)
             .then(
               result => {
@@ -140,6 +155,7 @@ var BakeryCI = yeoman.Base.extend({
       }];
 
       return this.prompt(repoPrompt).then(newProps => {
+        // write config
         let scmInfo = {
           active: props.createscm,
           scmtool: props.scmtool,
@@ -147,10 +163,10 @@ var BakeryCI = yeoman.Base.extend({
           organization: props.organization,
           repository: newProps.repository
         }
-        console.log(scmInfo);
         this.config.set('scm', scmInfo);
         this.config.save();
 
+        // made a judgement call not to write credentials to .yo.rc.json
         if (props.gittoken) {
           this.gittoken = props.gittoken;
         }
@@ -159,24 +175,33 @@ var BakeryCI = yeoman.Base.extend({
   },
 
   writing: function() {
-    feedback.info("scm is writing");
+
+    /*
+      This gets down to business and creates the repo for the project. This creates the remote repo, then
+      does all the work locally to prep the local project staging directory for push (ie. inits the repo,
+      adds the remote repo as the 'origin', adds all the files, then commits all the added files).
+      Finally it pushes the local staging directory to the remote repo.
+    */
     let scmInfo = this.config.get('scm');
     let cmInfo = this.config.get('cm');
     let cmImplInfo = this.config.get(cmInfo.generatorName);
 
-    console.log('scmInfo.scmtool: ' + scmInfo.scmtool);
     switch (scmInfo.scmtool) {
       case SCM_TOOL_GITHUB:
-        feedback.info("dest root: " + this.destinationRoot());
+        // create https://[hostname]/[organization]/[repository] Git repo
         this.github.createOrgRepository(scmInfo.organization, scmInfo.repository, cmInfo.shortdescription)
           .then(repo => {
+              // init local repo
               return this.github.init(this.destinationRoot());
             },
             err => {
+              // if the repository could not be created STOP. This will run INSTEAD of
+              //  the repo => {} callback above in the event of error
               feedback.warn("Could not create repository: " + err.message);
               process.exit(1);
             })
           .then(() => {
+            // set the remote repo as the 'origin' for the local staging repo
             let url = [
                         'https://' + scmInfo.scmhost,
                         scmInfo.organization,
@@ -185,19 +210,15 @@ var BakeryCI = yeoman.Base.extend({
             return this.github.setOrigin(this.destinationRoot(), url);
           })
           .then(repo => {
-            console.log("adding content of project directory");
-            return this.github.add(this.destinationRoot(), cmInfo.authorname, cmInfo.authoremail, 'created by generator-bakery');
+            // add all the things!
+            return this.github.add(this.destinationRoot(),
+                                   cmInfo.authorname,
+                                   cmInfo.authoremail,
+                                   'created by generator-bakery');
           })
           .then(() => {
+            // push eveyrthing to the repo
             return this.github.push(this.destinationRoot());
-          })
-          .then(repo => {
-            let url = [
-                        'https://' + scmInfo.scmhost,
-                        scmInfo.organization,
-                        scmInfo.repository
-                      ].join('/');
-            return this.github.setOrigin(this.destinationRoot(), url);
           });
         // need to implement this...
         break;

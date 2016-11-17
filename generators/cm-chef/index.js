@@ -52,10 +52,17 @@ var BakeryCM = yeoman.Base.extend({
   },
 
   writing: function() {
+    /*
+      TAKE NOTE: these next two lines are fallout of having to include ALL
+        sub-generators in .composeWith(...) at the top level. Essentially
+        ALL SUBGENERATORS RUN ALL THE TIME. So we have to escape from
+        generators we don't want running within EVERY lifecycle method.
+
+      (ugh)
+    */
     let cmInfo = this.config.get('cm');
     if (cmInfo.generatorName != 'cm-chef') return;
 
-    feedback.info("cm-chef is writing");
     var replacements = {
       license: cmInfo.license,
       project_name: this.config.get('bake').projectname,
@@ -93,6 +100,17 @@ var BakeryCM = yeoman.Base.extend({
   },
 
   install: function() {
+    /*
+      TAKE NOTE: these next two lines are fallout of having to include ALL
+        sub-generators in .composeWith(...) at the top level. Essentially
+        ALL SUBGENERATORS RUN ALL THE TIME. So we have to escape from
+        generators we don't want running within EVERY lifecycle method.
+
+      (ugh)
+    */
+    let cmInfo = this.config.get('cm');
+    if (cmInfo.generatorName != 'cm-chef') return;
+
     this.spawnCommand('./install_cookbooks.sh');
   }
 });

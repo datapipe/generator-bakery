@@ -11,12 +11,15 @@ const LICENSES = ['Proprietary - All Rights Reserved', 'Apache v2.0', 'GPL v3', 
       CM_TOOL_POWERSHELL = 'Powershell (Windows Only)',
       CM_TOOL_BASH = 'BASH (Linux Only)',
       CM_TOOLS = [ CM_TOOL_CHEF, CM_TOOL_PUPPET, CM_TOOL_POWERSHELL, CM_TOOL_BASH ],
+
       CM_GEN_CHEF = 'cm-chef',
       CM_GEN_PUPPET = 'cm-puppet',
       CM_GEN_POWERSHELL = 'cm-powershell',
       CM_GEN_BASH = 'cm-bash',
       CM_GENS = [ CM_GEN_CHEF, CM_GEN_PUPPET, CM_GEN_POWERSHELL, CM_GEN_BASH ];
-
+/*
+  Collects the high-level config needed by any of the CM payload implementations.
+*/
 var BakeryCM = yeoman.Base.extend({
 
   constructor: function() {
@@ -26,6 +29,7 @@ var BakeryCM = yeoman.Base.extend({
   },
 
   initializing: function() {
+    // establish some defaults
     let gen_defaults = {
       cm: {
         tool: CM_TOOL_CHEF,
@@ -100,6 +104,7 @@ var BakeryCM = yeoman.Base.extend({
     }];
 
     return this.prompt(prompts).then(function(props) {
+      // push new property values into config
       let cmInfo = {
         tool: props.tool,
         license: props.license,
@@ -132,9 +137,6 @@ var BakeryCM = yeoman.Base.extend({
     }.bind(this));
   },
 
-  writing: function() {
-    feedback.info("cm is writing");
-  }
 });
 
 module.exports = BakeryCM;
