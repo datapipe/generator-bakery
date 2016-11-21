@@ -48,7 +48,17 @@ var BakeryCM = yeoman.Base.extend({
   },
 
   prompting: function() {
-    this.log(bakery.banner('Puppet CM Project'));
+    /*
+      TAKE NOTE: these next two lines are fallout of having to include ALL
+        sub-generators in .composeWith(...) at the top level. Essentially
+        ALL SUBGENERATORS RUN ALL THE TIME. So we have to escape from
+        generators we don't want running within EVERY lifecycle method.
+
+      (ugh)
+    */
+    let cmInfo = this.config.get('cm');
+    if (cmInfo.generatorName != 'cm-puppet') return;
+
     var puppetInfo = this.config.get('cm-puppet');
     var prompts = [{
       type: 'input',
@@ -68,7 +78,17 @@ var BakeryCM = yeoman.Base.extend({
   },
 
   writing: function() {
+    /*
+      TAKE NOTE: these next two lines are fallout of having to include ALL
+        sub-generators in .composeWith(...) at the top level. Essentially
+        ALL SUBGENERATORS RUN ALL THE TIME. So we have to escape from
+        generators we don't want running within EVERY lifecycle method.
+
+      (ugh)
+    */
     let cmInfo = this.config.get('cm');
+    if (cmInfo.generatorName != 'cm-puppet') return;
+
     let puppetInfo = this.config.get('cm-puppet');
     var replacements = {
       license: cmInfo.license,
