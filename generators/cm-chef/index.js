@@ -71,7 +71,7 @@ var BakeryCM = yeoman.Base.extend({
       short_description: cmInfo.shortdescription,
       long_description: cmInfo.longdescription,
       source_url: cmInfo.sourceurl,
-      pronect_url: cmInfo.projecturl,
+      project_url: cmInfo.projecturl,
       issues_url: cmInfo.issuesurl,
       version: cmInfo.initialversion,
       year: new Date().getFullYear()
