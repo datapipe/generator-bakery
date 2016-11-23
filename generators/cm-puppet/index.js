@@ -10,7 +10,6 @@ const yeoman = require('yeoman-generator'),
   _ = require('lodash');
 
 const FILELIST = [
-    'hiera/hiera.yml',
     'manifests/default.pp',
     'modules/README.md',
     'spec/classes/init_spec.rb',
@@ -98,7 +97,7 @@ var BakeryCM = yeoman.Base.extend({
       short_description: cmInfo.shortdescription,
       long_description: cmInfo.longdescription,
       source_url: cmInfo.sourceurl,
-      pronect_url: puppetInfo.projecturl,
+      project_url: puppetInfo.projecturl,
       issues_url: cmInfo.issuesurl,
       version: cmInfo.initialversion,
       year: new Date().getFullYear()
