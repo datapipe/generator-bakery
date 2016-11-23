@@ -77,7 +77,7 @@ var BakeryCM = yeoman.Base.extend({
       name: 'shortdescription',
       message: 'Enter a short description of the project:',
       required: true,
-      default: cmInfo.shortdescripton
+      default: cmInfo.shortdescription
     }, {
       type: 'input',
       name: 'longdescription',
