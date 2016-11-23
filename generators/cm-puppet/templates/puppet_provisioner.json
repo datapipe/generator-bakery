@@ -1,0 +1,16 @@
+{
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "sudo apt-get -y update",
+        "sudo apt-get -y install puppet"
+      ]
+    },
+    {
+      "module_paths": "modules",
+      "type": "puppet-masterless",
+      "manifest_file": "manifests/site.pp"
+    }
+  ]
+}
