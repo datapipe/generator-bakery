@@ -19,6 +19,6 @@ fi
 
 if [ -d "$COOKBOOK_DIRECTORY" ]; then
   rm -rf "$COOKBOOK_DIRECTORY"
-  echo '==> removed previous berks-cookbooks installation, so there is no nested of cookbooks'
+  echo '==> removed previous berks-cookbooks installation, so there are no nested cookbooks'
 fi
 berks vendor
