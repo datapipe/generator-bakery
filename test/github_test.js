@@ -16,14 +16,14 @@ let repo_opts = {
   hostname: process.env.GITHUB_HOSTNAME,
   username: process.env.GITHUB_USER,
   org: process.env.GITHUB_ORG,
-  reponame: "test-" + process.env.GITHUB_USER + "-" + (new Date()).getTime()
+  reponame: 'test-' + process.env.GITHUB_USER + '-' + (new Date()).getTime()
 }
 
 // fail if these are not set -- set them as environment variables if needed. see testing.sh.example
-repo_opts.accessToken || assert.fail("GITHUB_API_ACCESS_TOKEN must be defined for testing")
-repo_opts.hostname || assert.fail("GITHUB_HOSTNAME must be defined for testing")
-repo_opts.username || assert.fail("GITHUB_USER must be defined for testing")
-repo_opts.org || assert.fail("GITHUB_ORG must be defined for testing")
+repo_opts.accessToken || assert.fail('GITHUB_API_ACCESS_TOKEN must be defined for testing')
+repo_opts.hostname || assert.fail('GITHUB_HOSTNAME must be defined for testing')
+repo_opts.username || assert.fail('GITHUB_USER must be defined for testing')
+repo_opts.org || assert.fail('GITHUB_ORG must be defined for testing')
 
 let credentials = {
   type: 'accessToken',
@@ -73,12 +73,12 @@ describe('Github class remote actions', function() {
       });
   });
 
-  it ("forks a repo", function() {
+  it ('forks a repo', function() {
     this.timeout(30000);
     let reponame = process.env.GITHUB_REPO_TO_FORK;
     return github.fork(repo_opts.org, reponame)
       .catch(err => {
-        console.error("failed to fork repo: " + err.message);
+        console.error('failed to fork repo: ' + err.message);
         return Promise.reject(err);
       })
       .then(github.getRepoInfo(repo_opts.username, reponame))
@@ -90,20 +90,20 @@ describe('Github class remote actions', function() {
 
 });
 
-describe("Github class local working directory actions", function() {
+describe('Github class local working directory actions', function() {
   this.timeout(10000);
 
-  let tmpDir = "/tmp/github_test";
-  let repo = tmpDir + "/repo";
-  let notARepo = tmpDir + "/notarepo";
-  let repofile = "README.md";
+  let tmpDir = '/tmp/github_test';
+  let repo = tmpDir + '/repo';
+  let notARepo = tmpDir + '/notarepo';
+  let repofile = 'README.md';
 
   // setup a local repo directory and a non-repo directory
   before(function() {
     fs.ensureDirSync(repo);
     fs.ensureDirSync(notARepo);
-    fs.writeFileSync(repo + "/" + repofile, "# TESTING", err => { assert.fail(err); });
-    fs.writeFileSync(notARepo + "/" + repofile, "# TESTING", err => { assert.fail(err); });
+    fs.writeFileSync(repo + '/' + repofile, '# TESTING', err => { assert.fail(err); });
+    fs.writeFileSync(notARepo + '/' + repofile, '# TESTING', err => { assert.fail(err); });
   });
 
   // init repository
@@ -118,13 +118,13 @@ describe("Github class local working directory actions", function() {
 
   // add a file to the repo
   before(function() {
-    return exec('git commit -m "initial commit"', {cwd: repo})
+    return exec('git commit -m 'initial commit'', {cwd: repo})
   });
 
   // add a remote to the repo
   before(function() {
-    let cmd = "git remote add origin https://"
-              + [repo_opts.hostname, repo_opts.username, 'repo'].join('/') + ".git";
+    let cmd = 'git remote add origin https://'
+              + [repo_opts.hostname, repo_opts.username, 'repo'].join('/') + '.git';
     return exec(cmd, {cwd: repo});
   });
 
@@ -136,10 +136,10 @@ describe("Github class local working directory actions", function() {
     });
   });
 
-  it ("inits a repo", function() {
+  it ('inits a repo', function() {
     return github.init(notARepo)
       .then(result => {
-        assert(fs.existsSync(notARepo + "/.git"));
+        assert(fs.existsSync(notARepo + '/.git'));
         return Promise.resolve(true);
       })
       .catch(err => {
@@ -147,7 +147,7 @@ describe("Github class local working directory actions", function() {
       });
   });
 
-  it ("errors if initing an existing repo", function() {
+  it ('errors if initing an existing repo', function() {
     return github.init(repo)
       .then(result => {
         assert.fail('should not init an existing repo');
@@ -158,14 +158,14 @@ describe("Github class local working directory actions", function() {
       });
   });
 
-  it ("lists remotes", function() {
+  it ('lists remotes', function() {
     return github.listRemotes(repo)
       .then(result => {
         expect(result[0]).to.equals('origin');
       });
   });
 
-  it ("adds a remote", function() {
+  it ('adds a remote', function() {
     let remoteUrl = 'https://github.com/mochajs/mocha.git';
     return github.addRemote(repo, 'test', remoteUrl)
       .then(result => {
@@ -176,16 +176,16 @@ describe("Github class local working directory actions", function() {
   });
 });
 
-describe("full workflow", function() {
-  let tmpDir = "/tmp/github_workflow_test";
-  let repo = tmpDir + "/repo";
-  let notARepo = tmpDir + "/notarepo";
-  let repofile = "README.md";
+describe('full workflow', function() {
+  let tmpDir = '/tmp/github_workflow_test';
+  let repo = tmpDir + '/repo';
+  let notARepo = tmpDir + '/notarepo';
+  let repofile = 'README.md';
 
   // setup a local repo directory and a non-repo directory
   before(function() {
     fs.ensureDirSync(repo);
-    fs.writeFileSync(repo + "/" + repofile, "# TESTING", err => { assert.fail(err); });
+    fs.writeFileSync(repo + '/' + repofile, '# TESTING', err => { assert.fail(err); });
   });
 
   // init repository
@@ -200,7 +200,7 @@ describe("full workflow", function() {
 
   // add a file to the repo
   before(function() {
-    return exec('git commit -m "initial commit"', {cwd: repo})
+    return exec('git commit -m 'initial commit'', {cwd: repo})
   });
 
   after(function() {
@@ -215,11 +215,11 @@ describe("full workflow", function() {
     });
   });
 
-  it("creates a repo", function() {
+  it('creates a repo', function() {
     this.timeout(30000);
     let reponame = 'lib_github_test_repo';
     let remoteUrl = [
-      "https://" + repo_opts.hostname,
+      'https://' + repo_opts.hostname,
       repo_opts.username,
       reponame].join('/');
 
@@ -234,7 +234,7 @@ describe("full workflow", function() {
         return github.clone(repo_opts.username, reponame, notARepo);
       })
       .then(repo => {
-        assert(fs.existsSync(notARepo + "/README.md"));
+        assert(fs.existsSync(notARepo + '/README.md'));
         return Promise.resolve(repo);
       });
   });

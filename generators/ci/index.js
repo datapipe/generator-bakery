@@ -37,14 +37,14 @@ var BakeryCI = yeoman.Base.extend({
     let ciInfo = this.config.get('ci');
 
     var prompts = [{
-      type: "confirm",
-      name: "createci",
-      message: "Create CI Scripts?",
+      type: 'confirm',
+      name: 'createci',
+      message: 'Create CI Scripts?',
       default: ciInfo.active
     }, {
-      type: "list",
-      name: "citool",
-      message: "Continuous Integration (CI) tool:",
+      type: 'list',
+      name: 'citool',
+      message: 'Continuous Integration (CI) tool:',
       choices: CI_TOOLS,
       when: function(response) {
         return response.createci;
@@ -67,20 +67,20 @@ var BakeryCI = yeoman.Base.extend({
   },
 
   writing: function() {
-    var file = "";
+    var file = '';
     let ciInfo = this.config.get('ci');
     switch (ciInfo.createci) {
       case CI_TOOL_DRONE:
-        file = ".drone.yml";
+        file = '.drone.yml';
         break;
       case CI_TOOL_JENKINS:
-        file = "Jenkinsfile.xml";
+        file = 'Jenkinsfile.xml';
         break;
       default:
         feedback.warn('CI toolset ' + ciInfo.createci + ' is not currently available. Skipping CI script setup.');
         break;
     };
-    if (file != "") {
+    if (file != '') {
       this.fs.copyTpl(
         this.templatePath(file),
         this.destinationPath(file),

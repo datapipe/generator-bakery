@@ -49,23 +49,23 @@ var BakeryCI = yeoman.Base.extend({
 
     var prompts = [
     {
-      type: "confirm",
-      name: "createscm",
-      message: "Attempt to create Source Control repository?",
+      type: 'confirm',
+      name: 'createscm',
+      message: 'Attempt to create Source Control repository?',
       default: scmInfo.active
     }, {
-      type: "list",
-      name: "scmtool",
-      message: "Source Control Management (SCM) tool:",
+      type: 'list',
+      name: 'scmtool',
+      message: 'Source Control Management (SCM) tool:',
       choices: SCM_TOOLS,
       when: function(response) {
         return response.createscm;
       },
       default: scmInfo.scmtool
     }, {
-      type: "input",
-      name: "gittoken",
-      message: "Github OAuth token (this will NOT be saved - set env. var. GIT_TOKEN to skip):",
+      type: 'input',
+      name: 'gittoken',
+      message: 'Github OAuth token (this will NOT be saved - set env. var. GIT_TOKEN to skip):',
       when: response => {
         return (response.createscm && !this.gittoken);
       },
@@ -77,9 +77,9 @@ var BakeryCI = yeoman.Base.extend({
         return true;
       }
     }, {
-      type: "input",
-      name: "scmhost",
-      message: "Source Control Management hostname:",
+      type: 'input',
+      name: 'scmhost',
+      message: 'Source Control Management hostname:',
       when: function(response) {
         return response.createscm;
       },
@@ -92,19 +92,19 @@ var BakeryCI = yeoman.Base.extend({
         this.github = new Github(host, credentials);
         return this.github.getUserInfo().then(
           userInfo => {
-            feedback.info("confirmed authentication for " + userInfo.login);
+            feedback.info('confirmed authentication for ' + userInfo.login);
             return true;
           },
           err => {
-            feedback.warn("could not authenticate to " + host + ": " + err.message);
+            feedback.warn('could not authenticate to ' + host + ': ' + err.message);
             return false;
           }
         )
       }
     }, {
-      type: "list",
-      name: "organization",
-      message: "Select which organization should own the repository:",
+      type: 'list',
+      name: 'organization',
+      message: 'Select which organization should own the repository:',
       choices: () => {
         // obtain the list of organizations this user has access to
         return this.github.getOrganizations()
@@ -129,9 +129,9 @@ var BakeryCI = yeoman.Base.extend({
       return props;
     }).then(props => {
       let repoPrompt = [{
-        type: "input",
-        name: "repository",
-        message: "Repository name:",
+        type: 'input',
+        name: 'repository',
+        message: 'Repository name:',
         when: responses => {
           return props.createscm;
         },
@@ -148,7 +148,7 @@ var BakeryCI = yeoman.Base.extend({
                 return Promise.resolve(true);
               },
               err => {
-                feedback.warn("could not validate repo: " + err.message);
+                feedback.warn('could not validate repo: ' + err.message);
                 return Promise.resolve(false);
               });
         }
@@ -197,7 +197,7 @@ var BakeryCI = yeoman.Base.extend({
             err => {
               // if the repository could not be created STOP. This will run INSTEAD of
               //  the repo => {} callback above in the event of error
-              feedback.warn("Could not create repository: " + err.message);
+              feedback.warn('Could not create repository: ' + err.message);
               process.exit(1);
             })
           .then(() => {

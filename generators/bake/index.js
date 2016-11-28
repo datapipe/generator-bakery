@@ -91,9 +91,9 @@ var BakeryBake = yeoman.Base.extend({
     // define initial prompts
     let bakeInfo = this.config.get('bake');
     var initialPrompts = [{
-      type: "confirm",
-      name: "createami",
-      message: "Create Amazon Machine Image?",
+      type: 'confirm',
+      name: 'createami',
+      message: 'Create Amazon Machine Image?',
       default: bakeInfo.active
     }, {
       type: 'input',
@@ -112,9 +112,9 @@ var BakeryBake = yeoman.Base.extend({
       },
       default: bakeInfo.amidescription
     }, {
-      type: "checkbox",
-      name: "awsregions",
-      message: "Choose AWS Region(s) for creation",
+      type: 'checkbox',
+      name: 'awsregions',
+      message: 'Choose AWS Region(s) for creation',
       choices: AWS_REGIONS,
       when: function(response) {
         return response.createami;
@@ -193,10 +193,10 @@ var BakeryBake = yeoman.Base.extend({
           }).then(function(successful) {
             return successful;
           }, function(err) {
-            feedback.warn("error while looking up AMI: " + err.message);
+            feedback.warn('error while looking up AMI: ' + err.message);
             return false;
           }).catch(err => {
-            feedback.warn("error while looking up AMI: " + err.message);
+            feedback.warn('error while looking up AMI: ' + err.message);
             return false;
           });
         }

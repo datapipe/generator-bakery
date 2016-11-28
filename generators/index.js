@@ -1,13 +1,8 @@
 'use strict';
-const yeoman = require('yeoman-generator'),
-  chalk = require('chalk'),
-  yosay = require('yosay'),
-  bakery = require('../lib/bakery'),
-  feedback = require('../lib/feedback'),
-  debug = require('debug')('bakery:generator:index'),
-  mkdirp = require('mkdirp'),
-  path = require('path'),
-  _ = require('lodash');
+const yeoman = require('yeoman-generator');
+const chalk = require('chalk');
+const yosay = require('yosay');
+const path = require('path');
 
 var BakeryGenerator = yeoman.Base.extend({
 
