@@ -1,4 +1,4 @@
-# generator-bakery [![NPM version](https://badge.fury.io/js/generator-bakery.svg)](http://badge.fury.io/js/generator-bakery) [![Build Status](https://secure.travis-ci.org/datapipe/generator-bakery.svg?branch=master)](https://travis-ci.org/datapipe/generator-bakery) [![Dependency Status][daviddm-image]][daviddm-url]
+# generator-bakery [![NPM version](https://badge.fury.io/js/generator-bakery.svg)](http://badge.fury.io/js/generator-bakery) [![Build Status](https://secure.travis-ci.org/datapipe/generator-bakery.svg?branch=master)](https://travis-ci.org/datapipe/generator-bakery) [![Dependency Status](https://david-dm.org/datapipe/generator-bakery.svg)](https://david-dm.org/datapipe/generator-bakery)
 > AWS Image Repo generator for building consistent AMI&#39;s
 
 ## Installation
