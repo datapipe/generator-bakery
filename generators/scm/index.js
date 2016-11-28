@@ -223,7 +223,9 @@ var BakeryCI = yeoman.Base.extend({
         // need to implement this...
         break;
       default:
-        feedback.warn('SCM toolset ' + tool + ' is not currently available. Skipping SCM script setup');
+        if (typeof tool != 'undefined') {
+          feedback.warn('SCM toolset ' + tool + ' is not currently available. Skipping SCM script setup');
+        }
         break;
     }
   },
