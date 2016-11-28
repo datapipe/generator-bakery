@@ -64,13 +64,13 @@ var BakeryCM = yeoman.Base.extend({
     }, {
       type: 'input',
       name: 'authorname',
-      message: 'Enter the author's full name or organization:',
+      message: 'Enter the author\'s full name or organization:',
       default: cmInfo.authorname,
       required: true
     }, {
       type: 'input',
       name: 'authoremail',
-      message: 'Enter the author or organization's email:',
+      message: 'Enter the author or organization\'s email:',
       default: cmInfo.authoremail
     }, {
       type: 'input',
