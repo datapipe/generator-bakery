@@ -49,7 +49,8 @@
     "node-rest-client": "^2.0.1",
     "underscore": "^1.8.3",
     "yeoman-test": "^1.0.0",
-    "yeoman-assert": "^2.0.0"
+    "yeoman-assert": "^2.0.0",
+    "eslint-config-xo": "^0.17.0"
   },
   "eslintConfig": {
     "extends": "xo-space",
