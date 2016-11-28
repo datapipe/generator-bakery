@@ -9,14 +9,16 @@
     "url": "https://datapipe.com/"
   },
   "files": [
-    "generators"
+    "generators",
+    "lib"
   ],
   "main": "generators/index.js",
-  "keywords":[
+  "keywords": [
     "yeoman-generator"
   ],
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=4.0.0",
+    "npm": ">=1.3"
   },
   "dependencies": {
     "aws-sdk": "^2.6.14",
@@ -37,19 +39,25 @@
     "mkdirp": "^0.5.1"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "child-process-promise": "^2.2.0",
-    "gulp": "^3.9.0",
+    "gulp": "^3.6.0",
+    "gulp-coveralls": "^0.1.0",
     "gulp-eslint": "^2.0.0",
     "gulp-exclude-gitignore": "^1.0.0",
-    "gulp-istanbul": "^1.0.0",
-    "gulp-line-ending-corrector": "^1.0.1",
+    "gulp-istanbul": "^0.10.3",
     "gulp-mocha": "^2.0.0",
     "gulp-nsp": "^2.1.0",
     "gulp-plumber": "^1.0.0",
+    "chai": "^3.5.0",
+    "child-process-promise": "^2.2.0",
     "node-rest-client": "^2.0.1",
     "yeoman-test": "^1.0.0",
     "yeoman-assert": "^2.0.0"
+  },
+  "eslintConfig": {
+    "extends": "xo-space",
+    "env": {
+      "mocha": true
+    }
   },
   "repository": "datapipe/generator-bakery",
   "scripts": {

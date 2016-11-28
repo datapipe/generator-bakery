@@ -1,34 +1,34 @@
 'use strict';
-const yeoman = require('yeoman-generator'),
+var yeoman = require('yeoman-generator'),
   bakery = require('../../lib/bakery'),
   feedback = require('../../lib/feedback'),
   debug = require('debug')('bakery:generators:cm:index');
 
-const LICENSES = ['Proprietary - All Rights Reserved', 'Apache v2.0', 'GPL v3', 'MIT', 'ISC'],
+var LICENSES = ['Proprietary - All Rights Reserved', 'Apache v2.0', 'GPL v3', 'MIT', 'ISC'],
 
-      CM_TOOL_CHEF = 'Chef Zero',
-      CM_TOOL_PUPPET = 'Masterless Puppet',
-      CM_TOOL_POWERSHELL = 'Powershell (Windows Only)',
-      CM_TOOL_BASH = 'BASH (Linux Only)',
-      CM_TOOLS = [ CM_TOOL_CHEF, CM_TOOL_PUPPET, CM_TOOL_POWERSHELL, CM_TOOL_BASH ],
+  CM_TOOL_CHEF = 'Chef Zero',
+  CM_TOOL_PUPPET = 'Masterless Puppet',
+  CM_TOOL_POWERSHELL = 'Powershell (Windows Only)',
+  CM_TOOL_BASH = 'BASH (Linux Only)',
+  CM_TOOLS = [CM_TOOL_CHEF, CM_TOOL_PUPPET, CM_TOOL_POWERSHELL, CM_TOOL_BASH],
 
-      CM_GEN_CHEF = 'cm-chef',
-      CM_GEN_PUPPET = 'cm-puppet',
-      CM_GEN_POWERSHELL = 'cm-powershell',
-      CM_GEN_BASH = 'cm-bash',
-      CM_GENS = [ CM_GEN_CHEF, CM_GEN_PUPPET, CM_GEN_POWERSHELL, CM_GEN_BASH ];
+  CM_GEN_CHEF = 'cm-chef',
+  CM_GEN_PUPPET = 'cm-puppet',
+  CM_GEN_POWERSHELL = 'cm-powershell',
+  CM_GEN_BASH = 'cm-bash',
+  CM_GENS = [CM_GEN_CHEF, CM_GEN_PUPPET, CM_GEN_POWERSHELL, CM_GEN_BASH];
 /*
   Collects the high-level config needed by any of the CM payload implementations.
 */
 var BakeryCM = yeoman.Base.extend({
 
-  constructor: function() {
+  constructor: function () {
     yeoman.Base.apply(this, arguments);
 
     this._options.help.desc = 'Show this help';
   },
 
-  initializing: function() {
+  initializing: function () {
     // establish some defaults
     let gen_defaults = {
       cm: {
@@ -43,11 +43,10 @@ var BakeryCM = yeoman.Base.extend({
     this.config.defaults(gen_defaults);
   },
 
-  prompting: function() {
+  prompting: function () {
     this.log(bakery.banner('Configuration Management!'));
     var cmInfo = this.config.get('cm');
-    var prompts = [
-    {
+    var prompts = [{
       name: 'tool',
       type: 'list',
       choices: CM_TOOLS,
@@ -103,7 +102,7 @@ var BakeryCM = yeoman.Base.extend({
       default: cmInfo.initialversion
     }];
 
-    return this.prompt(prompts).then(function(props) {
+    return this.prompt(prompts).then(function (props) {
       // push new property values into config
       let cmInfo = {
         tool: props.tool,
@@ -117,19 +116,19 @@ var BakeryCM = yeoman.Base.extend({
         initialversion: props.initialversion
       };
 
-      switch(cmInfo.tool) {
-        case CM_TOOL_CHEF:
-          cmInfo.generatorName = CM_GEN_CHEF;
-          break;
-        case CM_TOOL_PUPPET:
-          cmInfo.generatorName = CM_GEN_PUPPET;
-          break;
-        case CM_TOOL_POWERSHELL:
-          cmInfo.generatorName = CM_GEN_POWERSHELL;
-          break;
-        case CM_TOOL_BASH:
-          cmInfo.generatorName = CM_GEN_BASH;
-          break;
+      switch (cmInfo.tool) {
+      case CM_TOOL_CHEF:
+        cmInfo.generatorName = CM_GEN_CHEF;
+        break;
+      case CM_TOOL_PUPPET:
+        cmInfo.generatorName = CM_GEN_PUPPET;
+        break;
+      case CM_TOOL_POWERSHELL:
+        cmInfo.generatorName = CM_GEN_POWERSHELL;
+        break;
+      case CM_TOOL_BASH:
+        cmInfo.generatorName = CM_GEN_BASH;
+        break;
       }
 
       this.config.set('cm', cmInfo);

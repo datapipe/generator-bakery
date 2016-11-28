@@ -1,5 +1,5 @@
 'use strict';
-const yeoman = require('yeoman-generator'),
+var yeoman = require('yeoman-generator'),
   chalk = require('chalk'),
   yosay = require('yosay'),
   bakery = require('../../lib/bakery'),
@@ -10,45 +10,44 @@ const yeoman = require('yeoman-generator'),
   _ = require('lodash');
 
 const FILELIST = [
-    'manifests/site.pp',
-    'modules/README.md',
-    'spec/classes/init_spec.rb',
-    'spec/spec_helper.rb',
-    '.fixtures.yml',
-    '.gitignore',
-    'Gemfile',
-    'hiera.yaml',
-    'metadata.json',
-    'Rakefile',
-    'README.md',
-    'install_modules.sh',
-    'Puppetfile'
-  ];
+  'manifests/site.pp',
+  'modules/README.md',
+  'spec/classes/init_spec.rb',
+  'spec/spec_helper.rb',
+  '.fixtures.yml',
+  '.gitignore',
+  'Gemfile',
+  'hiera.yaml',
+  'metadata.json',
+  'Rakefile',
+  'README.md',
+  'install_modules.sh',
+  'Puppetfile'
+];
 
 var BakeryCM = yeoman.Base.extend({
 
-  constructor: function() {
+  constructor: function () {
     yeoman.Base.apply(this, arguments);
 
     this._options.help.desc = 'Show this help';
 
     this.argument('projectname', {
       type: String,
-      required: (this.config.get('projectname') == undefined)
+      required: this.config.get('projectname') == undefined
     });
 
   },
 
-  initializing: function() {
+  initializing: function () {
     let gen_defaults = {
-      'cm-puppet': {
-      }
-    }
+      'cm-puppet': {}
+    };
 
     this.config.defaults(gen_defaults);
   },
 
-  prompting: function() {
+  prompting: function () {
     /*
       TAKE NOTE: these next two lines are fallout of having to include ALL
         sub-generators in .composeWith(...) at the top level. Essentially
@@ -58,7 +57,9 @@ var BakeryCM = yeoman.Base.extend({
       (ugh)
     */
     let cmInfo = this.config.get('cm');
-    if (cmInfo.generatorName != 'cm-puppet') return;
+    if (cmInfo.generatorName != 'cm-puppet') {
+      return;
+    }
 
     var puppetInfo = this.config.get('cm-puppet');
     var prompts = [{
@@ -68,7 +69,7 @@ var BakeryCM = yeoman.Base.extend({
       default: puppetInfo.projecturl
     }];
 
-    return this.prompt(prompts).then(function(props) {
+    return this.prompt(prompts).then(function (props) {
       let gen_config = {
         projecturl: props.projecturl
       };
@@ -78,7 +79,7 @@ var BakeryCM = yeoman.Base.extend({
     }.bind(this));
   },
 
-  writing: function() {
+  writing: function () {
     /*
       TAKE NOTE: these next two lines are fallout of having to include ALL
         sub-generators in .composeWith(...) at the top level. Essentially
@@ -88,7 +89,9 @@ var BakeryCM = yeoman.Base.extend({
       (ugh)
     */
     let cmInfo = this.config.get('cm');
-    if (cmInfo.generatorName != 'cm-puppet') return;
+    if (cmInfo.generatorName != 'cm-puppet') {
+      return;
+    }
 
     let puppetInfo = this.config.get('cm-puppet');
     var replacements = {
@@ -107,14 +110,13 @@ var BakeryCM = yeoman.Base.extend({
 
     this.sourceRoot(__dirname + '/templates');
 
-    var packer_options = {
-    };
+    var packer_options = {};
 
     var provisioner_json = this.fs.readJSON(this.templatePath('puppet_provisioner.json'));
 
     this.fs.extendJSON(this.destinationPath('packer.json'), provisioner_json);
 
-    _.forEach(FILELIST, function(file) {
+    _.forEach(FILELIST, function (file) {
       this.fs.copyTpl(
         this.templatePath(file),
         this.destinationPath(file),
@@ -123,7 +125,7 @@ var BakeryCM = yeoman.Base.extend({
     }.bind(this));
   },
 
-  install: function() {
+  install: function () {
     /*
       TAKE NOTE: these next two lines are fallout of having to include ALL
         sub-generators in .composeWith(...) at the top level. Essentially
@@ -133,7 +135,9 @@ var BakeryCM = yeoman.Base.extend({
       (ugh)
     */
     let cmInfo = this.config.get('cm');
-    if (cmInfo.generatorName != 'cm-puppet') return;
+    if (cmInfo.generatorName != 'cm-puppet') {
+      return;
+    }
 
     this.spawnCommand('./install_modules.sh');
   }

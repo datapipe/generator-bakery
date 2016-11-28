@@ -1,5 +1,5 @@
 'use strict';
-const yeoman = require('yeoman-generator'),
+var yeoman = require('yeoman-generator'),
   chalk = require('chalk'),
   yosay = require('yosay'),
   bakery = require('../../lib/bakery'),
@@ -10,48 +10,49 @@ const yeoman = require('yeoman-generator'),
   _ = require('lodash');
 
 const FILELIST = [
-    'recipes/default.rb',
-    'spec/unit/recipes/default_spec.rb',
-    'spec/spec_helper.rb',
-    'test/recipes/default_spec.rb',
-    '.gitignore',
-    '.kitchen.yml',
-    'Berksfile',
-    'chefignore',
-    'Gemfile',
-    'metadata.rb',
-    'packer_variables.json',
-    'README.md',
-    'with_zero.rb',
-    'install_cookbooks.sh'
-  ];
+  'recipes/default.rb',
+  'spec/unit/recipes/default_spec.rb',
+  'spec/spec_helper.rb',
+  'test/recipes/default_spec.rb',
+  '.gitignore',
+  '.kitchen.yml',
+  'Berksfile',
+  'chefignore',
+  'Gemfile',
+  'metadata.rb',
+  'packer_variables.json',
+  'README.md',
+  'with_zero.rb',
+  'install_cookbooks.sh'
+];
 
 var BakeryCM = yeoman.Base.extend({
 
-  constructor: function() {
+  constructor: function () {
     yeoman.Base.apply(this, arguments);
 
     this._options.help.desc = 'Show this help';
 
     this.argument('projectname', {
       type: String,
-      required: (this.config.get('projectname') == undefined)
+      required: this.config.get('projectname') == undefined
     });
   },
 
-  initializing: function() {
+  initializing: function () {
     let cmInfo = this.config.get('cm');
-    if (cmInfo.generatorName != 'cm-chef') return;
+    if (cmInfo.generatorName != 'cm-chef') {
+      return;
+    }
 
     let gen_defaults = {
-      'cm-chef': {
-      }
-    }
+      'cm-chef': {}
+    };
 
     this.config.defaults(gen_defaults);
   },
 
-  writing: function() {
+  writing: function () {
     /*
       TAKE NOTE: these next two lines are fallout of having to include ALL
         sub-generators in .composeWith(...) at the top level. Essentially
@@ -61,7 +62,9 @@ var BakeryCM = yeoman.Base.extend({
       (ugh)
     */
     let cmInfo = this.config.get('cm');
-    if (cmInfo.generatorName != 'cm-chef') return;
+    if (cmInfo.generatorName != 'cm-chef') {
+      return;
+    }
 
     var replacements = {
       license: cmInfo.license,
@@ -80,17 +83,16 @@ var BakeryCM = yeoman.Base.extend({
     var fileList = [];
     this.sourceRoot(__dirname + '/templates');
 
-    var packer_options = {
-    };
+    var packer_options = {};
 
     var provisioner_json = this.fs.readJSON(this.templatePath('chef_provisioner.json'));
     // var execute_command = 'cd /opt/chef/cookbooks/cookbooks-0 && sudo chef-client -z -o ' + packer_options.run_list + ' -c ../solo.rb';
     // we're going to default to a specific runlist for now.
     var execute_command = 'cd /opt/chef/cookbooks/cookbooks-0 && sudo chef-client -z -o recipe[onerun::default] -c ../solo.rb';
-    provisioner_json.provisioners[0].execute_command = execute_command
+    provisioner_json.provisioners[0].execute_command = execute_command;
     this.fs.extendJSON(this.destinationPath('packer.json'), provisioner_json);
 
-    _.forEach(FILELIST, function(file) {
+    _.forEach(FILELIST, function (file) {
       this.fs.copyTpl(
         this.templatePath(file),
         this.destinationPath(file),
@@ -99,7 +101,7 @@ var BakeryCM = yeoman.Base.extend({
     }.bind(this));
   },
 
-  install: function() {
+  install: function () {
     /*
       TAKE NOTE: these next two lines are fallout of having to include ALL
         sub-generators in .composeWith(...) at the top level. Essentially
@@ -109,7 +111,9 @@ var BakeryCM = yeoman.Base.extend({
       (ugh)
     */
     let cmInfo = this.config.get('cm');
-    if (cmInfo.generatorName != 'cm-chef') return;
+    if (cmInfo.generatorName != 'cm-chef') {
+      return;
+    }
 
     this.spawnCommand('./install_cookbooks.sh');
   }

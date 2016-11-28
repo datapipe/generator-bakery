@@ -1,12 +1,13 @@
 'use strict';
-const yeoman = require('yeoman-generator');
-const chalk = require('chalk');
-const yosay = require('yosay');
-const path = require('path');
+
+var yeoman = require('yeoman-generator');
+var chalk = require('chalk');
+var yosay = require('yosay');
+var path = require('path');
 
 var BakeryGenerator = yeoman.Base.extend({
 
-  constructor: function() {
+  constructor: function () {
     yeoman.Base.apply(this, arguments);
     this._options.help.desc = 'Show this help';
 
@@ -38,33 +39,35 @@ var BakeryGenerator = yeoman.Base.extend({
     });
   },
 
-  initializing: function() {
+  initializing: function () {
     // establish default
-    let default_config = {
+    let defaultConfig = {
       projectname: this.projectname
-    }
-    this.config.defaults(default_config);
+    };
+    this.config.defaults(defaultConfig);
 
     // this seem vestigal - @pmmclory?
-    var configFound = this.baseName !== undefined && this.applicationType !== undefined;
+    var configFound = this.baseName !== undefined && this.applicationType !==
+      undefined;
     if (configFound) {
       this.existingProject = true;
     }
   },
 
-  prompting: function() {
+  prompting: function () {
     // Have Yeoman greet the user.
     this.log(yosay(
-      'Welcome to the super-excellent ' + chalk.red('bakery') + ' generator!'
+      'Welcome to the super-excellent ' + chalk.red('bakery') +
+      ' generator!'
     ));
 
     // If projectname is not supplied as an argument at the command line collect it here
     let prompts = [{
-      name: "projectname",
-      type: "input",
-      message: "Project name",
+      name: 'projectname',
+      type: 'input',
+      message: 'Project name',
       when: () => {
-        return (this.projectname.length < 1);
+        return this.projectname.length < 1;
       },
       // on first-run this uses value set in 'initializing'. Subsequently values are read
       //  from .yo.rc.json
@@ -72,7 +75,7 @@ var BakeryGenerator = yeoman.Base.extend({
       required: true
     }];
 
-    return this.prompt(prompts).then(function(props) {
+    return this.prompt(prompts).then(function (props) {
       /*
         we're using the Yeoman-native config system. This means all config gets stored in
         .yo.rc.json in the CWD. Values gathered from the top-level generator (this one) are
@@ -86,7 +89,8 @@ var BakeryGenerator = yeoman.Base.extend({
          keys only. config will not do a deep merge when you set/get things. So beware the
          clobberage.
       */
-      this.config.set('projectname', props.projectname || this.config.get('projectname'));
+      this.config.set('projectname', props.projectname || this.config
+        .get('projectname'));
       this.config.set('source', props.source);
 
       /*
@@ -132,7 +136,7 @@ var BakeryGenerator = yeoman.Base.extend({
     }.bind(this));
   },
 
-  configuring: function() {
+  configuring: function () {
     // set up the project's working directory
     let projectname = this.config.get('projectname');
     if (path.basename(this.destinationRoot()) !== projectname) {
@@ -141,7 +145,7 @@ var BakeryGenerator = yeoman.Base.extend({
     }
   },
 
-  install: function() {
+  install: function () {
     this.installDependencies();
   }
 });

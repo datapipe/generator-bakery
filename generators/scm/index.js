@@ -1,15 +1,11 @@
 'use strict';
 const yeoman = require('yeoman-generator'),
-  chalk = require('chalk'),
-  yosay = require('yosay'),
   bakery = require('../../lib/bakery'),
   Github = require('../../lib/github').Github,
-  feedback = require('../../lib/feedback'),
-  debug = require('debug')('bakery:generators:scm:index'),
-  _ = require('lodash');
+  feedback = require('../../lib/feedback');
 
-const SCM_TOOL_GITHUB = 'github';
-const SCM_TOOLS = [ SCM_TOOL_GITHUB ];
+var SCM_TOOL_GITHUB = 'github';
+var SCM_TOOLS = [SCM_TOOL_GITHUB];
 
 var BakeryCI = yeoman.Base.extend({
 
@@ -20,7 +16,7 @@ var BakeryCI = yeoman.Base.extend({
 
     this.argument('projectname', {
       type: String,
-      required: (this.config.get('projectname') == undefined)
+      required: this.config.get('projectname') === undefined
     });
 
     // allow credentials to be set as env variables so they do not need
@@ -29,7 +25,7 @@ var BakeryCI = yeoman.Base.extend({
   },
 
   initializing: function() {
-    let default_config = {
+    let defaultConfig = {
       scm: {
         active: true,
         scmtool: SCM_TOOL_GITHUB,
@@ -37,18 +33,16 @@ var BakeryCI = yeoman.Base.extend({
         // repo should use projectname by default
         repository: this.projectname
       }
-    }
-    this.config.defaults(default_config);
+    };
+    this.config.defaults(defaultConfig);
   },
 
   prompting: function() {
     this.log(bakery.banner('Source Control Setup!'));
 
     let scmInfo = this.config.get('scm');
-    let _org;
 
-    var prompts = [
-    {
+    var prompts = [{
       type: 'confirm',
       name: 'createscm',
       message: 'Attempt to create Source Control repository?',
@@ -67,7 +61,7 @@ var BakeryCI = yeoman.Base.extend({
       name: 'gittoken',
       message: 'Github OAuth token (this will NOT be saved - set env. var. GIT_TOKEN to skip):',
       when: response => {
-        return (response.createscm && !this.gittoken);
+        return response.createscm && !this.gittoken;
       },
       required: true,
       // no hook is provided for processing prompts individual - hijacking validate(...)
@@ -88,18 +82,20 @@ var BakeryCI = yeoman.Base.extend({
         let credentials = {
           type: 'accessToken',
           accessToken: this.gittoken
-        }
+        };
         this.github = new Github(host, credentials);
         return this.github.getUserInfo().then(
           userInfo => {
-            feedback.info('confirmed authentication for ' + userInfo.login);
+            feedback.info('confirmed authentication for ' +
+              userInfo.login);
             return true;
           },
           err => {
-            feedback.warn('could not authenticate to ' + host + ': ' + err.message);
+            feedback.warn('could not authenticate to ' + host +
+              ': ' + err.message);
             return false;
           }
-        )
+        );
       }
     }, {
       type: 'list',
@@ -110,7 +106,7 @@ var BakeryCI = yeoman.Base.extend({
         return this.github.getOrganizations()
           .then(orgs => {
             let choices = [];
-            orgs.forEach( org => {
+            orgs.forEach(org => {
               choices.push(org.login);
             });
             return Promise.resolve(choices);
@@ -138,17 +134,21 @@ var BakeryCI = yeoman.Base.extend({
         default: scmInfo.repository,
         validate: repo => {
           // check if the repo already exists
-          return this.github.getRepoInfo(props.organization, repo)
+          return this.github.getRepoInfo(props.organization,
+              repo)
             .then(
               result => {
-                if (result != null && result.name == repo){
-                  feedback.warn('Repository %s already exists for organization %s', repo, props.organization);
+                if (result !== null && result.name === repo) {
+                  feedback.warn(
+                    'Repository %s already exists for organization %s',
+                    repo, props.organization);
                   return Promise.resolve(false);
                 }
                 return Promise.resolve(true);
               },
               err => {
-                feedback.warn('could not validate repo: ' + err.message);
+                feedback.warn('could not validate repo: ' + err
+                  .message);
                 return Promise.resolve(false);
               });
         }
@@ -156,13 +156,13 @@ var BakeryCI = yeoman.Base.extend({
 
       return this.prompt(repoPrompt).then(newProps => {
         // write config
-        let scmInfo = {
+        scmInfo = {
           active: props.createscm,
           scmtool: props.scmtool,
           scmhost: props.scmhost,
           organization: props.organization,
           repository: newProps.repository
-        }
+        };
         this.config.set('scm', scmInfo);
         this.config.save();
 
@@ -184,12 +184,13 @@ var BakeryCI = yeoman.Base.extend({
     */
     let scmInfo = this.config.get('scm');
     let cmInfo = this.config.get('cm');
-    let cmImplInfo = this.config.get(cmInfo.generatorName);
+    // let cmImplInfo = this.config.get(cmInfo.generatorName);
 
     switch (scmInfo.scmtool) {
       case SCM_TOOL_GITHUB:
         // create https://[hostname]/[organization]/[repository] Git repo
-        this.github.createOrgRepository(scmInfo.organization, scmInfo.repository, cmInfo.shortdescription)
+        this.github.createOrgRepository(scmInfo.organization, scmInfo.repository,
+            cmInfo.shortdescription)
           .then(repo => {
               // init local repo
               return this.github.init(this.destinationRoot());
@@ -203,18 +204,18 @@ var BakeryCI = yeoman.Base.extend({
           .then(() => {
             // set the remote repo as the 'origin' for the local staging repo
             let url = [
-                        'https://' + scmInfo.scmhost,
-                        scmInfo.organization,
-                        scmInfo.repository
-                      ].join('/');
+              'https://' + scmInfo.scmhost,
+              scmInfo.organization,
+              scmInfo.repository
+            ].join('/');
             return this.github.setOrigin(this.destinationRoot(), url);
           })
           .then(repo => {
             // add all the things!
             return this.github.add(this.destinationRoot(),
-                                   cmInfo.authorname,
-                                   cmInfo.authoremail,
-                                   'created by generator-bakery');
+              cmInfo.authorname,
+              cmInfo.authoremail,
+              'created by generator-bakery');
           })
           .then(() => {
             // push eveyrthing to the repo
@@ -223,15 +224,15 @@ var BakeryCI = yeoman.Base.extend({
         // need to implement this...
         break;
       default:
-        if (typeof scmInfo.scmtool != 'undefined') {
-          feedback.warn('SCM toolset ' + scmInfo.scmtool + ' is not currently available. Skipping SCM script setup');
+        if (typeof scmInfo.scmtool !== 'undefined') {
+          feedback.warn('SCM toolset ' + scmInfo.scmtool +
+            ' is not currently available. Skipping SCM script setup');
         }
         break;
     }
   },
 
-  default: {
-  },
+  default: {},
 
   install: function() {
     this.installDependencies();

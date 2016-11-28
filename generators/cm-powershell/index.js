@@ -1,5 +1,5 @@
 'use strict';
-const yeoman = require('yeoman-generator'),
+var yeoman = require('yeoman-generator'),
   chalk = require('chalk'),
   yosay = require('yosay'),
   bakery = require('../../lib/bakery'),
@@ -12,19 +12,19 @@ const yeoman = require('yeoman-generator'),
 // placeholder for CM implementaiton delivering a PowerShell-based project.
 var BakeryCM = yeoman.Base.extend({
 
-  constructor: function() {
+  constructor: function () {
     yeoman.Base.apply(this, arguments);
 
     this._options.help.desc = 'Show this help';
 
     this.argument('projectname', {
       type: String,
-      required: (this.config.get('projectname') == undefined)
+      required: this.config.get('projectname') == undefined
     });
   },
 
   // generators are invalid without at least one method to run during lifecycle
-  default: function() {
+  default: function () {
     /*
       TAKE NOTE: these next two lines are fallout of having to include ALL
         sub-generators in .composeWith(...) at the top level. Essentially
@@ -34,7 +34,9 @@ var BakeryCM = yeoman.Base.extend({
       (ugh)
     */
     let cmInfo = this.config.get('cm');
-    if (cmInfo.generatorName != 'cm-powershell') return;
+    if (cmInfo.generatorName != 'cm-powershell') {
+      return;
+    }
   }
 
 });
