@@ -1,6 +1,5 @@
 
 #!/bin/bash
-COOKBOOK_DIRECTORY='berks-cookbooks'
 RUBY_CMD='chruby'
 BUNDLE_CMD='bundle'
 
@@ -17,8 +16,4 @@ if type "$BUNDLE_CMD" > /dev/null; then
   bundle
 fi
 
-if [ -d "$COOKBOOK_DIRECTORY" ]; then
-  rm -rf "$COOKBOOK_DIRECTORY"
-  echo '==> removed previous berks-cookbooks installation, so there are no nested cookbooks'
-fi
-berks vendor
+librarian-puppet install --verbose

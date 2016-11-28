@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+#^syntax detection
+
+forge "https://forgeapi.puppetlabs.com"
+
+# the nginx module from Puppet Forge
+mod 'puppet-nginx', '0.5.0'

@@ -10,7 +10,7 @@ const yeoman = require('yeoman-generator'),
   _ = require('lodash');
 
 const FILELIST = [
-    'manifests/default.pp',
+    'manifests/site.pp',
     'modules/README.md',
     'spec/classes/init_spec.rb',
     'spec/spec_helper.rb',
@@ -20,7 +20,9 @@ const FILELIST = [
     'hiera.yaml',
     'metadata.json',
     'Rakefile',
-    'README.md'
+    'README.md',
+    'install_modules.sh',
+    'Puppetfile'
   ];
 
 var BakeryCM = yeoman.Base.extend({
@@ -110,7 +112,6 @@ var BakeryCM = yeoman.Base.extend({
 
     var provisioner_json = this.fs.readJSON(this.templatePath('puppet_provisioner.json'));
 
-    // provisioner_json.provisioners[0].execute_command = ...
     this.fs.extendJSON(this.destinationPath('packer.json'), provisioner_json);
 
     _.forEach(FILELIST, function(file) {
@@ -122,6 +123,20 @@ var BakeryCM = yeoman.Base.extend({
     }.bind(this));
   },
 
+  install: function() {
+    /*
+      TAKE NOTE: these next two lines are fallout of having to include ALL
+        sub-generators in .composeWith(...) at the top level. Essentially
+        ALL SUBGENERATORS RUN ALL THE TIME. So we have to escape from
+        generators we don't want running within EVERY lifecycle method.
+
+      (ugh)
+    */
+    let cmInfo = this.config.get('cm');
+    if (cmInfo.generatorName != 'cm-puppet') return;
+
+    this.spawnCommand('./install_modules.sh');
+  }
 });
 
 module.exports = BakeryCM;
