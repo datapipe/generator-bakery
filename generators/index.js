@@ -63,7 +63,9 @@ var BakeryGenerator = yeoman.Base.extend({
       name: "projectname",
       type: "input",
       message: "Project name",
-      when: () => { return (this.projectname.length < 1); },
+      when: () => {
+        return (this.projectname.length < 1);
+      },
       // on first-run this uses value set in 'initializing'. Subsequently values are read
       //  from .yo.rc.json
       default: this.config.get('projectname'),
@@ -96,7 +98,9 @@ var BakeryGenerator = yeoman.Base.extend({
       this.config.save();
 
       let projectname = this.config.get('projectname');
-      let args = { arguments: [ projectname ] };
+      let args = {
+        arguments: [projectname]
+      };
 
       // Call all the sub-generators.
       this.composeWith('bakery:cm', args);
@@ -121,7 +125,9 @@ var BakeryGenerator = yeoman.Base.extend({
       this.composeWith('bakery:ci', args);
 
       // bake requires the awsprofile name which was passed as a command line arg.
-      args.options = { awsprofile: this.options.awsprofile };
+      args.options = {
+        awsprofile: this.options.awsprofile
+      };
       this.composeWith('bakery:bake', args);
     }.bind(this));
   },
