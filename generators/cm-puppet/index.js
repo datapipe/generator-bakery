@@ -27,7 +27,7 @@ const FILELIST = [
 
 var BakeryCM = yeoman.Base.extend({
 
-  constructor: function () {
+  constructor: function() {
     yeoman.Base.apply(this, arguments);
 
     this._options.help.desc = 'Show this help';
@@ -39,7 +39,7 @@ var BakeryCM = yeoman.Base.extend({
 
   },
 
-  initializing: function () {
+  initializing: function() {
     let gen_defaults = {
       'cm-puppet': {}
     };
@@ -47,7 +47,7 @@ var BakeryCM = yeoman.Base.extend({
     this.config.defaults(gen_defaults);
   },
 
-  prompting: function () {
+  prompting: function() {
     /*
       TAKE NOTE: these next two lines are fallout of having to include ALL
         sub-generators in .composeWith(...) at the top level. Essentially
@@ -69,7 +69,7 @@ var BakeryCM = yeoman.Base.extend({
       default: puppetInfo.projecturl
     }];
 
-    return this.prompt(prompts).then(function (props) {
+    return this.prompt(prompts).then(function(props) {
       let gen_config = {
         projecturl: props.projecturl
       };
@@ -79,7 +79,7 @@ var BakeryCM = yeoman.Base.extend({
     }.bind(this));
   },
 
-  writing: function () {
+  writing: function() {
     /*
       TAKE NOTE: these next two lines are fallout of having to include ALL
         sub-generators in .composeWith(...) at the top level. Essentially
@@ -112,11 +112,13 @@ var BakeryCM = yeoman.Base.extend({
 
     var packer_options = {};
 
-    var provisioner_json = this.fs.readJSON(this.templatePath('puppet_provisioner.json'));
+    var provisioner_json = this.fs.readJSON(this.templatePath(
+      'puppet_provisioner.json'));
 
-    this.fs.extendJSON(this.destinationPath('packer.json'), provisioner_json);
+    this.fs.extendJSON(this.destinationPath('packer.json'),
+      provisioner_json);
 
-    _.forEach(FILELIST, function (file) {
+    _.forEach(FILELIST, function(file) {
       this.fs.copyTpl(
         this.templatePath(file),
         this.destinationPath(file),
@@ -125,7 +127,20 @@ var BakeryCM = yeoman.Base.extend({
     }.bind(this));
   },
 
-  install: function () {
+  end: function() {
+    hasbin('packer', function(result) {
+      if (result === true) {
+        this.log(
+          'Puppet is not installed locally. If you are going to test locally, please go to the link below for installation information.'
+        );
+        this.log(
+          'Installation URL: https://docs.puppet.com/puppet/4.8/reference/install_pre.html'
+        )
+      }
+    });
+  },
+
+  install: function() {
     /*
       TAKE NOTE: these next two lines are fallout of having to include ALL
         sub-generators in .composeWith(...) at the top level. Essentially

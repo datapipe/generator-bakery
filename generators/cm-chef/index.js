@@ -28,7 +28,7 @@ const FILELIST = [
 
 var BakeryCM = yeoman.Base.extend({
 
-  constructor: function () {
+  constructor: function() {
     yeoman.Base.apply(this, arguments);
 
     this._options.help.desc = 'Show this help';
@@ -39,7 +39,7 @@ var BakeryCM = yeoman.Base.extend({
     });
   },
 
-  initializing: function () {
+  initializing: function() {
     let cmInfo = this.config.get('cm');
     if (cmInfo.generatorName != 'cm-chef') {
       return;
@@ -52,7 +52,7 @@ var BakeryCM = yeoman.Base.extend({
     this.config.defaults(gen_defaults);
   },
 
-  writing: function () {
+  writing: function() {
     /*
       TAKE NOTE: these next two lines are fallout of having to include ALL
         sub-generators in .composeWith(...) at the top level. Essentially
@@ -85,14 +85,17 @@ var BakeryCM = yeoman.Base.extend({
 
     var packer_options = {};
 
-    var provisioner_json = this.fs.readJSON(this.templatePath('chef_provisioner.json'));
+    var provisioner_json = this.fs.readJSON(this.templatePath(
+      'chef_provisioner.json'));
     // var execute_command = 'cd /opt/chef/cookbooks/cookbooks-0 && sudo chef-client -z -o ' + packer_options.run_list + ' -c ../solo.rb';
     // we're going to default to a specific runlist for now.
-    var execute_command = 'cd /opt/chef/cookbooks/cookbooks-0 && sudo chef-client -z -o recipe[onerun::default] -c ../solo.rb';
+    var execute_command =
+      'cd /opt/chef/cookbooks/cookbooks-0 && sudo chef-client -z -o recipe[onerun::default] -c ../solo.rb';
     provisioner_json.provisioners[0].execute_command = execute_command;
-    this.fs.extendJSON(this.destinationPath('packer.json'), provisioner_json);
+    this.fs.extendJSON(this.destinationPath('packer.json'),
+      provisioner_json);
 
-    _.forEach(FILELIST, function (file) {
+    _.forEach(FILELIST, function(file) {
       this.fs.copyTpl(
         this.templatePath(file),
         this.destinationPath(file),
@@ -101,7 +104,7 @@ var BakeryCM = yeoman.Base.extend({
     }.bind(this));
   },
 
-  install: function () {
+  install: function() {
     /*
       TAKE NOTE: these next two lines are fallout of having to include ALL
         sub-generators in .composeWith(...) at the top level. Essentially
@@ -116,7 +119,20 @@ var BakeryCM = yeoman.Base.extend({
     }
 
     this.spawnCommand('./install_cookbooks.sh');
-  }
+  },
+
+  end: function() {
+    hasbin.all(['chef', 'kitchen'], function(result) {
+      if (result === true) {
+        this.log(
+          'Chef and Test Kitchen are not installed locally. If you are going to test locally, please go to the link below for installation information.'
+        );
+        this.log(
+          'Installation URL: https://downloads.chef.io/chef-dk/')
+      }
+    });
+  },
+
 });
 
 module.exports = BakeryCM;
