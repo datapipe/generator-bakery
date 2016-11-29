@@ -12,8 +12,6 @@ var BakeryGenerator = yeoman.Base.extend({
     yeoman.Base.apply(this, arguments);
     this._options.help.desc = 'Show this help';
 
-    this.existingProject = false;
-
     this.argument('projectname', {
       type: String,
       required: false,
@@ -46,13 +44,6 @@ var BakeryGenerator = yeoman.Base.extend({
       projectname: this.projectname
     };
     this.config.defaults(defaultConfig);
-
-    // this seem vestigal - @pmmclory?
-    var configFound = this.baseName !== undefined && this.applicationType !==
-      undefined;
-    if (configFound) {
-      this.existingProject = true;
-    }
   },
 
   prompting: function() {
