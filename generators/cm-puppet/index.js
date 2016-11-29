@@ -121,6 +121,7 @@ var BakeryCM = yeoman.Base.extend({
     _.forEach(FILELIST, function(file) {
       this.fs.copyTpl(
         this.templatePath(file),
+        this.destinationPath(file),
         file,
         replacements
       );

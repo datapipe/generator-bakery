@@ -307,6 +307,7 @@ var BakeryBake = yeoman.Base.extend({
 
     this.fs.copyTpl(
       this.templatePath('packer-vars.json'),
+      this.destinationPath('packer-vars.json'),
       'packer-vars.json'
     );
 
