@@ -231,6 +231,18 @@ var BakeryCI = yeoman.Base.extend({
         break;
     }
   },
+  end: function() {
+    hasbin('git', function(result) {
+      if (result === false) {
+        this.log(
+          'Git is not installed locally. If you\'re planning on interacting with git, please go to the link below for installation information.'
+        );
+        this.log(
+          'Installation URL: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git'
+        )
+      }
+    });
+  },
 
   default: {},
 
