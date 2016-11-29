@@ -7,7 +7,7 @@ BUNDLE_CMD='bundle'
 # and thus ~/.bashrc is not loaded. https://github.com/capistrano/chruby/issues/7
 #
 # this sets up chruby if it exists.  otherwise default to system ruby
-$CHRUBY_SCRIPT = "/usr/local/share/chruby/chruby.sh"
+CHRUBY_SCRIPT="/usr/local/share/chruby/chruby.sh"
 test -f $CHRUBY_SCRIPT && source $CHRUBY_SCRIPT
 if type chruby > /dev/null 2>&1; then
   chruby 2.3.1
