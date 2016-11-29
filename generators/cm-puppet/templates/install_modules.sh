@@ -1,4 +1,3 @@
-
 #!/bin/bash
 RUBY_CMD='chruby'
 BUNDLE_CMD='bundle'

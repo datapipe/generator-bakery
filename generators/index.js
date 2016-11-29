@@ -140,8 +140,7 @@ var BakeryGenerator = yeoman.Base.extend({
 
   configuring: function() {
     // set up the project's working directory
-    let tmpProjectName = this.projectname || this.config.get(
-      'projectname');
+    let tmpProjectName = this.config.get('projectname');
     if (!this.destinationRoot().includes(tmpProjectName)) {
       let projPath = path.join(this.options.workingdir || this.destinationRoot(),
         tmpProjectName);

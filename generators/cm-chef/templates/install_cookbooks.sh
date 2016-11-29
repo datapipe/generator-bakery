@@ -1,4 +1,3 @@
-
 #!/bin/bash
 COOKBOOK_DIRECTORY='berks-cookbooks'
 RUBY_CMD='chruby'

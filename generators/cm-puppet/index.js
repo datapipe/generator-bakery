@@ -129,12 +129,22 @@ var BakeryCM = yeoman.Base.extend({
 
   end: function() {
     hasbin('packer', function(result) {
-      if (result === true) {
+      if (result === false) {
         this.log(
           'Puppet is not installed locally. If you are going to test locally, please go to the link below for installation information.'
         );
         this.log(
           'Installation URL: https://docs.puppet.com/puppet/4.8/reference/install_pre.html'
+        )
+      }
+    });
+    hasbin('librarian-puppet', function(result) {
+      if (result === false) {
+        this.log(
+          'Librarian-puppet is not installed locally. If you are going to test locally, please go to the link below for installation information.'
+        );
+        this.log(
+          'Installation URL: https://github.com/rodjek/librarian-puppet'
         )
       }
     });

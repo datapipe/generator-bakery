@@ -123,7 +123,7 @@ var BakeryCM = yeoman.Base.extend({
 
   end: function() {
     hasbin.all(['chef', 'kitchen'], function(result) {
-      if (result === true) {
+      if (result === false) {
         this.log(
           'Chef and Test Kitchen are not installed locally. If you are going to test locally, please go to the link below for installation information.'
         );
@@ -131,6 +131,14 @@ var BakeryCM = yeoman.Base.extend({
           'Installation URL: https://downloads.chef.io/chef-dk/')
       }
     });
+    hasbin('bundle', function(result) {
+      if (result === false) {
+        this.log(
+          'Bundler is not installed locally. If you are going to test locally, please go to the link below for installation information.'
+        );
+        this.log('Installation URL: http://bundler.io/');
+      }
+    })
   },
 
 });
