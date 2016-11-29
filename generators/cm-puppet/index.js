@@ -115,13 +115,13 @@ var BakeryCM = yeoman.Base.extend({
     var provisioner_json = this.fs.readJSON(this.templatePath(
       'puppet_provisioner.json'));
 
-    this.fs.extendJSON(this.destinationPath('packer.json'),
+    this.fs.extendJSON('packer.json',
       provisioner_json);
 
     _.forEach(FILELIST, function(file) {
       this.fs.copyTpl(
         this.templatePath(file),
-        this.destinationPath(file),
+        file,
         replacements
       );
     }.bind(this));
