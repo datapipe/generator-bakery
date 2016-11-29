@@ -84,18 +84,18 @@ var BakeryCI = yeoman.Base.extend({
     if (file != '') {
       this.fs.copyTpl(
         this.templatePath(file),
-        this.destinationPath(file),
+        file,
         replacements
       );
     }
     this.fs.copyTpl(
       this.templatePath('build.sh'),
-      this.destinationPath('build.sh'),
+      'build.sh',
       replacements
     );
     this.fs.copyTpl(
       this.templatePath('build.ps1'),
-      this.destinationPath('build.ps1'),
+      'build.ps1',
       replacements
     );
 

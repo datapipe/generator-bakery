@@ -92,13 +92,13 @@ var BakeryCM = yeoman.Base.extend({
     var execute_command =
       'cd /opt/chef/cookbooks/cookbooks-0 && sudo chef-client -z -o recipe[onerun::default] -c ../solo.rb';
     provisioner_json.provisioners[0].execute_command = execute_command;
-    this.fs.extendJSON(this.destinationPath('packer.json'),
+    this.fs.extendJSON('packer.json',
       provisioner_json);
 
     _.forEach(FILELIST, function(file) {
       this.fs.copyTpl(
         this.templatePath(file),
-        this.destinationPath(file),
+        file,
         replacements
       );
     }.bind(this));
