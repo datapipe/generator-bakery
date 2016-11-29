@@ -29,7 +29,7 @@ var BakeryGenerator = yeoman.Base.extend({
       type: String,
       alias: 'w',
       desc: 'Identifies a parent directory for the output of this generator',
-      defaults: '.'
+      defaults: ''
     });
 
     this.option('awsprofile', {
@@ -142,8 +142,9 @@ var BakeryGenerator = yeoman.Base.extend({
     // set up the project's working directory
     let tmpProjectName = this.projectname || this.config.get(
       'projectname');
-    if (!path.basename(this.destinationRoot()).includes(tmpProjectName)) {
-      let projPath = path.join(this.options.workingdir, tmpProjectName);
+    if (!this.destinationRoot().includes(tmpProjectName)) {
+      let projPath = path.join(this.options.workingdir || this.destinationRoot(),
+        tmpProjectName);
       this.destinationRoot(projPath);
     }
   },
