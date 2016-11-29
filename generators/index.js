@@ -91,7 +91,11 @@ var BakeryGenerator = yeoman.Base.extend({
          keys only. config will not do a deep merge when you set/get things. So beware the
          clobberage.
       */
-      this.config.set('projectname', this.projectname || this.config
+
+      // there are three ways to set a projectname, 1) through an argument passed via cli
+      //   2) the .yo-rc file, and 3) the projectname prompt.  Adding in the ability to set
+      //   projectname via prompt
+      this.config.set('projectname', this.projectname || props.projectname || this.config
         .get('projectname'));
       this.config.set('source', props.source);
 
