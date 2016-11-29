@@ -68,7 +68,7 @@ var BakeryCM = yeoman.Base.extend({
 
     var replacements = {
       license: cmInfo.license,
-      project_name: this.config.get('bake').projectname,
+      project_name: this.config.get('projectname'),
       author_name: cmInfo.authorname,
       author_email: cmInfo.authoremail,
       short_description: cmInfo.shortdescription,
@@ -99,7 +99,6 @@ var BakeryCM = yeoman.Base.extend({
       this.fs.copyTpl(
         this.templatePath(file),
         this.destinationPath(file),
-        file,
         replacements
       );
     }.bind(this));
