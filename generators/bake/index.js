@@ -305,6 +305,12 @@ var BakeryBake = yeoman.Base.extend({
       return;
     }
 
+    this.fs.copyTpl(
+      this.templatePath('packer-vars.json'),
+      this.destinationPath('packer-vars.json'),
+      'packer-vars.json'
+    );
+
     var bake_json = this.fs.readJSON(this.templatePath('packer.json'));
 
     if (typeof bake_json === 'undefined' || bake_json == null) {
@@ -357,7 +363,7 @@ var BakeryBake = yeoman.Base.extend({
       bake_json.builders[0].iam_instance_profile = bakeInfo.iaminstanceprofile;
     }
 
-    var bake_tpl = this.fs.extendJSON(this.destinationPath('packer.json'),
+    var bake_tpl = this.fs.extendJSON('packer.json',
       bake_json);
 
   },

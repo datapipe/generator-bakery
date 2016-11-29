@@ -29,7 +29,7 @@ var BakeryGenerator = yeoman.Base.extend({
       type: String,
       alias: 'w',
       desc: 'Identifies a parent directory for the output of this generator',
-      defaults: '/tmp'
+      defaults: ''
     });
 
     this.option('awsprofile', {
@@ -72,7 +72,8 @@ var BakeryGenerator = yeoman.Base.extend({
       },
       // on first-run this uses value set in 'initializing'. Subsequently values are read
       //  from .yo.rc.json
-      default: this.config.get('projectname'),
+      default: this.projectname || this.config.get(
+        'projectname'),
       required: true
     }];
 
@@ -90,7 +91,7 @@ var BakeryGenerator = yeoman.Base.extend({
          keys only. config will not do a deep merge when you set/get things. So beware the
          clobberage.
       */
-      this.config.set('projectname', props.projectname || this.config
+      this.config.set('projectname', this.projectname || this.config
         .get('projectname'));
       this.config.set('source', props.source);
 
@@ -139,9 +140,10 @@ var BakeryGenerator = yeoman.Base.extend({
 
   configuring: function() {
     // set up the project's working directory
-    let projectname = this.config.get('projectname');
-    if (path.basename(this.destinationRoot()) !== projectname) {
-      let projPath = path.join(this.options.workingdir, projectname);
+    let tmpProjectName = this.config.get('projectname');
+    if (!this.destinationRoot().includes(tmpProjectName)) {
+      let projPath = path.join(this.options.workingdir || this.destinationRoot(),
+        tmpProjectName);
       this.destinationRoot(projPath);
     }
   },

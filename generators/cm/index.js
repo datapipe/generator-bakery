@@ -4,7 +4,9 @@ var yeoman = require('yeoman-generator'),
   feedback = require('../../lib/feedback'),
   debug = require('debug')('bakery:generators:cm:index');
 
-var LICENSES = ['Proprietary - All Rights Reserved', 'Apache v2.0', 'GPL v3', 'MIT', 'ISC'],
+var LICENSES = ['Proprietary - All Rights Reserved', 'Apache v2.0', 'GPL v3',
+    'MIT', 'ISC'
+  ],
 
   CM_TOOL_CHEF = 'Chef Zero',
   CM_TOOL_PUPPET = 'Masterless Puppet',
@@ -22,13 +24,13 @@ var LICENSES = ['Proprietary - All Rights Reserved', 'Apache v2.0', 'GPL v3', 'M
 */
 var BakeryCM = yeoman.Base.extend({
 
-  constructor: function () {
+  constructor: function() {
     yeoman.Base.apply(this, arguments);
 
     this._options.help.desc = 'Show this help';
   },
 
-  initializing: function () {
+  initializing: function() {
     // establish some defaults
     let gen_defaults = {
       cm: {
@@ -43,7 +45,7 @@ var BakeryCM = yeoman.Base.extend({
     this.config.defaults(gen_defaults);
   },
 
-  prompting: function () {
+  prompting: function() {
     this.log(bakery.banner('Configuration Management!'));
     var cmInfo = this.config.get('cm');
     var prompts = [{
@@ -88,7 +90,7 @@ var BakeryCM = yeoman.Base.extend({
       name: 'issuesurl',
       message: 'Enter the issues URL:',
       required: true,
-      default: cmInfo.issueurl
+      default: cmInfo.issuesurl
     }, {
       type: 'input',
       name: 'sourceurl',
@@ -102,7 +104,7 @@ var BakeryCM = yeoman.Base.extend({
       default: cmInfo.initialversion
     }];
 
-    return this.prompt(prompts).then(function (props) {
+    return this.prompt(prompts).then(function(props) {
       // push new property values into config
       let cmInfo = {
         tool: props.tool,
@@ -117,18 +119,18 @@ var BakeryCM = yeoman.Base.extend({
       };
 
       switch (cmInfo.tool) {
-      case CM_TOOL_CHEF:
-        cmInfo.generatorName = CM_GEN_CHEF;
-        break;
-      case CM_TOOL_PUPPET:
-        cmInfo.generatorName = CM_GEN_PUPPET;
-        break;
-      case CM_TOOL_POWERSHELL:
-        cmInfo.generatorName = CM_GEN_POWERSHELL;
-        break;
-      case CM_TOOL_BASH:
-        cmInfo.generatorName = CM_GEN_BASH;
-        break;
+        case CM_TOOL_CHEF:
+          cmInfo.generatorName = CM_GEN_CHEF;
+          break;
+        case CM_TOOL_PUPPET:
+          cmInfo.generatorName = CM_GEN_PUPPET;
+          break;
+        case CM_TOOL_POWERSHELL:
+          cmInfo.generatorName = CM_GEN_POWERSHELL;
+          break;
+        case CM_TOOL_BASH:
+          cmInfo.generatorName = CM_GEN_BASH;
+          break;
       }
 
       this.config.set('cm', cmInfo);

@@ -68,7 +68,7 @@ var BakeryCM = yeoman.Base.extend({
 
     var replacements = {
       license: cmInfo.license,
-      project_name: this.config.get('bake').projectname,
+      project_name: this.config.get('projectname'),
       author_name: cmInfo.authorname,
       author_email: cmInfo.authoremail,
       short_description: cmInfo.shortdescription,
@@ -92,7 +92,7 @@ var BakeryCM = yeoman.Base.extend({
     var execute_command =
       'cd /opt/chef/cookbooks/cookbooks-0 && sudo chef-client -z -o recipe[onerun::default] -c ../solo.rb';
     provisioner_json.provisioners[0].execute_command = execute_command;
-    this.fs.extendJSON(this.destinationPath('packer.json'),
+    this.fs.extendJSON('packer.json',
       provisioner_json);
 
     _.forEach(FILELIST, function(file) {
@@ -123,7 +123,7 @@ var BakeryCM = yeoman.Base.extend({
 
   end: function() {
     hasbin.all(['chef', 'kitchen'], function(result) {
-      if (result === true) {
+      if (result === false) {
         this.log(
           'Chef and Test Kitchen are not installed locally. If you are going to test locally, please go to the link below for installation information.'
         );
@@ -131,6 +131,14 @@ var BakeryCM = yeoman.Base.extend({
           'Installation URL: https://downloads.chef.io/chef-dk/')
       }
     });
+    hasbin('bundle', function(result) {
+      if (result === false) {
+        this.log(
+          'Bundler is not installed locally. If you are going to test locally, please go to the link below for installation information.'
+        );
+        this.log('Installation URL: http://bundler.io/');
+      }
+    })
   },
 
 });

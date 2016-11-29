@@ -96,7 +96,7 @@ var BakeryCM = yeoman.Base.extend({
     let puppetInfo = this.config.get('cm-puppet');
     var replacements = {
       license: cmInfo.license,
-      project_name: this.config.get('bake').projectname,
+      project_name: this.config.get('projectname'),
       author_name: cmInfo.authorname,
       author_email: cmInfo.authoremail,
       short_description: cmInfo.shortdescription,
@@ -115,7 +115,7 @@ var BakeryCM = yeoman.Base.extend({
     var provisioner_json = this.fs.readJSON(this.templatePath(
       'puppet_provisioner.json'));
 
-    this.fs.extendJSON(this.destinationPath('packer.json'),
+    this.fs.extendJSON('packer.json',
       provisioner_json);
 
     _.forEach(FILELIST, function(file) {
@@ -129,12 +129,22 @@ var BakeryCM = yeoman.Base.extend({
 
   end: function() {
     hasbin('packer', function(result) {
-      if (result === true) {
+      if (result === false) {
         this.log(
           'Puppet is not installed locally. If you are going to test locally, please go to the link below for installation information.'
         );
         this.log(
           'Installation URL: https://docs.puppet.com/puppet/4.8/reference/install_pre.html'
+        )
+      }
+    });
+    hasbin('librarian-puppet', function(result) {
+      if (result === false) {
+        this.log(
+          'Librarian-puppet is not installed locally. If you are going to test locally, please go to the link below for installation information.'
+        );
+        this.log(
+          'Installation URL: https://github.com/rodjek/librarian-puppet'
         )
       }
     });
