@@ -12,8 +12,6 @@ var BakeryGenerator = yeoman.Base.extend({
     yeoman.Base.apply(this, arguments);
     this._options.help.desc = 'Show this help';
 
-    this.existingProject = false;
-
     this.argument('projectname', {
       type: String,
       required: false,
@@ -46,13 +44,6 @@ var BakeryGenerator = yeoman.Base.extend({
       projectname: this.projectname
     };
     this.config.defaults(defaultConfig);
-
-    // this seem vestigal - @pmmclory?
-    var configFound = this.baseName !== undefined && this.applicationType !==
-      undefined;
-    if (configFound) {
-      this.existingProject = true;
-    }
   },
 
   prompting: function() {
@@ -91,7 +82,11 @@ var BakeryGenerator = yeoman.Base.extend({
          keys only. config will not do a deep merge when you set/get things. So beware the
          clobberage.
       */
-      this.config.set('projectname', this.projectname || this.config
+
+      // there are three ways to set a projectname, 1) through an argument passed via cli
+      //   2) the .yo-rc file, and 3) the projectname prompt.  Adding in the ability to set
+      //   projectname via prompt
+      this.config.set('projectname', this.projectname || props.projectname || this.config
         .get('projectname'));
       this.config.set('source', props.source);
 
