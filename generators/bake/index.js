@@ -196,8 +196,7 @@ var BakeryBake = yeoman.Base.extend({
             //    3) default
             return bakery.validateAMIId(response, {
               awsregion: bakeInfo.primaryregion,
-              awsprofile: bakeInfo.awsprofile || process.env.AWS_PROFILE ||
-                'default'
+              awsprofile: bakeInfo.awsprofile || process.env.AWS_PROFILE || ''
             }).then(function(successful) {
               return successful;
             }, function(err) {
@@ -322,6 +321,8 @@ var BakeryBake = yeoman.Base.extend({
     }
 
     // creates the builder block
+    bake_json.builders[0].type = 'amazon-ebs';
+    bake_json.builders[0].ami_name = bakeInfo.aminame;
     bake_json.builders[0].region = bakeInfo.primaryregion;
     bake_json.builders[0].source_ami = bakeInfo.regionspecificami;
     bake_json.builders[0].instance_type = bakeInfo.buildimagetype;
