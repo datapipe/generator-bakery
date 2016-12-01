@@ -22,7 +22,9 @@ const FILELIST = [
   'Rakefile',
   'README.md',
   'install_modules.sh',
-  'Puppetfile'
+  'Puppetfile',
+  'build.sh',
+  'build.ps1'
 ];
 
 var BakeryCM = yeoman.Base.extend({
