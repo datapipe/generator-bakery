@@ -10,6 +10,7 @@ var yeoman = require('yeoman-generator'),
   _ = require('lodash');
 
 const FILELIST = [
+  'attributes/default.rb',
   'recipes/default.rb',
   'spec/unit/recipes/default_spec.rb',
   'spec/spec_helper.rb',
@@ -23,7 +24,9 @@ const FILELIST = [
   'packer_variables.json',
   'README.md',
   'with_zero.rb',
-  'install_cookbooks.sh'
+  'install_cookbooks.sh',
+  'build.sh',
+  'build.ps1'
 ];
 
 var BakeryCM = yeoman.Base.extend({

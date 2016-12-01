@@ -89,19 +89,6 @@ var BakeryCI = yeoman.Base.extend({
         replacements
       );
     }
-    this.fs.copyTpl(
-      this.templatePath('build.sh'),
-      this.destinationPath('build.sh'),
-      'build.sh',
-      replacements
-    );
-    this.fs.copyTpl(
-      this.templatePath('build.ps1'),
-      this.destinationPath('build.ps1'),
-      'build.ps1',
-      replacements
-    );
-
   },
 
   install: function() {

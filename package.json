@@ -1,6 +1,6 @@
 {
   "name": "generator-bakery",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "AWS Image Repo generator for building consistent AMI's",
   "homepage": "https://github.com/datapipe/generator-bakery",
   "author": {

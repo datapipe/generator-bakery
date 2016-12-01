@@ -170,106 +170,103 @@ var BakeryBake = yeoman.Base.extend({
 
       // define the remaining prompts
       var prompts = [{
-          type: 'list',
-          name: 'buildimagetype',
-          message: 'Instance Type for build:',
-          default: bakeInfo.buildimagetype,
-          choices: AWS_INSTANCE_TYPES,
-          when: function(response) {
-            return bakeInfo.active;
-          }
-        }, {
-          type: 'input',
-          name: 'regionspecificami',
-          message: function(response) {
-            return 'AMI ID in ' + bakeInfo.primaryregion +
-              ' region:';
-          },
-          default: bakeInfo.regionspecificami,
-          when: function(response) {
-            return bakeInfo.active;
-          },
-          validate: function(response) {
-            // validate that the AMI exists - send primary region; for profile defualt to:
-            //    1) --awsprofile/-p argument
-            //    2) Environment variable AWS_POFILE
-            //    3) default
-            return bakery.validateAMIId(response, {
-              awsregion: bakeInfo.primaryregion,
-              awsprofile: bakeInfo.awsprofile || process.env.AWS_PROFILE ||
-                'default'
-            }).then(function(successful) {
-              return successful;
-            }, function(err) {
-              feedback.warn('error while looking up AMI: ' +
-                err.message);
-              return false;
-            }).catch(err => {
-              feedback.warn('error while looking up AMI: ' +
-                err.message);
-              return false;
-            });
-          }
-        }, {
-          type: 'confirm',
-          name: 'iswindows',
-          message: 'Is this a Windows-based image:',
-          default: function() {
-            return bakeInfo.iswindows != undefined ? bakeInfo.iswindows :
-              process.env.WINDOWSIMAGE || false;
-          },
-          when: function(response) {
-            return bakeInfo.active;
-          }
-        },
-        // {
-        //   type: 'input',
-        //   name: 'amigroups',
-        //   message: 'Enter a list (comma separated) of groups to share this AMI with:',
-        //   when: function(response) {
-        //     return _this.options.createami;
-        //   }
-        // }, {
-        //   type: 'input',
-        //   name: 'amiusers',
-        //   message: 'Enter a list of (comma separated) account id\'s to share this AMI with:',
-        //   when: function(response) {
-        //     return _this.options.createami;
-        //   }
-        // }, {
-        //   type: 'input',
-        //   name: 'iaminstanceprofile',
-        //   message: 'Enter the IAM instance profile id you want to apply to instances while they are being built:',
-        //   when: function(response) {
-        //     return _this.options.createami;
-        //   }
-        // },
-        {
-          type: 'input',
-          name: 'vpcid',
-          message: 'Enter VPC ID, leave blank for default VPC:',
-          when: function(response) {
-            return bakeInfo.active;
-          },
-          default: bakeInfo.vpcid
-        }, {
-          type: 'input',
-          name: 'subnetid',
-          message: 'Enter subnet id - Required for non-default VPC ID:',
-          when: function(response) {
-            return bakeInfo.active && response.vpcid.length > 0;
-          },
-          default: bakeInfo.subnetid
-        }, {
-          type: 'input',
-          name: 'securitygroupids',
-          message: 'Enter security group ids (comma separated) - required for non-default VPC ID:',
-          when: function(response) {
-            return bakeInfo.active && response.vpcid.length > 0;
-          },
-          default: bakeInfo.securitygroupids
+        type: 'list',
+        name: 'buildimagetype',
+        message: 'Instance Type for build:',
+        default: bakeInfo.buildimagetype,
+        choices: AWS_INSTANCE_TYPES,
+        when: function(response) {
+          return bakeInfo.active;
         }
-      ];
+      }, {
+        type: 'input',
+        name: 'regionspecificami',
+        message: function(response) {
+          return 'AMI ID in ' + bakeInfo.primaryregion +
+            ' region:';
+        },
+        default: bakeInfo.regionspecificami,
+        when: function(response) {
+          return bakeInfo.active;
+        },
+        validate: function(response) {
+          // validate that the AMI exists - send primary region; for profile defualt to:
+          //    1) --awsprofile/-p argument
+          //    2) Environment variable AWS_POFILE
+          //    3) default
+          return bakery.validateAMIId(response, {
+            awsregion: bakeInfo.primaryregion,
+            awsprofile: bakeInfo.awsprofile || process.env.AWS_PROFILE ||
+              'default'
+          }).then(function(successful) {
+            return successful;
+          }, function(err) {
+            feedback.warn('error while looking up AMI: ' +
+              err.message);
+            return false;
+          }).catch(err => {
+            feedback.warn('error while looking up AMI: ' +
+              err.message);
+            return false;
+          });
+        }
+      }, {
+        type: 'confirm',
+        name: 'iswindows',
+        message: 'Is this a Windows-based image:',
+        default: function() {
+          return bakeInfo.iswindows != undefined ? bakeInfo.iswindows :
+            process.env.WINDOWSIMAGE || false;
+        },
+        when: function(response) {
+          return bakeInfo.active;
+        }
+      }, {
+        type: 'input',
+        name: 'amigroups',
+        message: 'Enter a list (comma separated) of groups to share this AMI with:',
+        when: function(response) {
+          return bakeInfo.active;
+        }
+      }, {
+        type: 'input',
+        name: 'amiusers',
+        message: 'Enter a list of (comma separated) account id\'s to share this AMI with:',
+        when: function(response) {
+          return bakeInfo.active;
+        }
+      }, {
+        type: 'input',
+        name: 'iaminstanceprofile',
+        message: 'Enter the IAM instance profile id you want to apply to instances while they are being built:',
+        when: function(response) {
+          return bakeInfo.active;
+        }
+      }, {
+        type: 'input',
+        name: 'vpcid',
+        message: 'Enter VPC ID, leave blank for default VPC:',
+        when: function(response) {
+          return bakeInfo.active;
+        },
+        default: bakeInfo.vpcid
+      }, {
+        type: 'input',
+        name: 'subnetid',
+        message: 'Enter subnet id - Required for non-default VPC ID:',
+        when: function(response) {
+          return bakeInfo.active && response.vpcid.length > 0;
+        },
+        default: bakeInfo.subnetid
+      }, {
+        type: 'input',
+        name: 'securitygroupids',
+        message: 'Enter security group ids (comma separated) - required for non-default VPC ID:',
+        when: function(response) {
+          return bakeInfo.active && response.vpcid.length > 0;
+        },
+        default: bakeInfo.securitygroupids
+      }];
       return _this.prompt(prompts).then(function(props) {
         bakeInfo.buildimagetype = props.buildimagetype;
         bakeInfo.regionspecificami = props.regionspecificami;
@@ -322,6 +319,9 @@ var BakeryBake = yeoman.Base.extend({
     }
 
     // creates the builder block
+    bake_json.builders[0].type = 'amazon-ebs';
+    bake_json.builders[0].ami_name = bakeInfo.aminame;
+    bake_json.builders[0].ssh_username = 'ubuntu';
     bake_json.builders[0].region = bakeInfo.primaryregion;
     bake_json.builders[0].source_ami = bakeInfo.regionspecificami;
     bake_json.builders[0].instance_type = bakeInfo.buildimagetype;
