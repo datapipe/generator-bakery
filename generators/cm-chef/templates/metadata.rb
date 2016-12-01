@@ -1,4 +1,4 @@
-name 'onerun'
+name '<%= project_name %>'
 maintainer '<%= author_name %>'
 maintainer_email '<%= author_email %>'
 license '<%= license %>'

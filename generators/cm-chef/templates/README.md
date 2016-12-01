@@ -1,10 +1,10 @@
-# sample_cookbook
+# <%= project_name %>
 
-This is a sample cookbook generated via the chef command line interface for version 0.18.30
+This is a sample cookbook generated via the ```yo bakery``` [generator](https://github.com/datapipe/generator-bakery)
 
 # setup
 
-in order to get test kitchen to run I use the following in my Gemfile.
+in order to get test kitchen to run, the following in your Gemfile.
 
 ```
 source 'https://rubygems.org'
@@ -20,3 +20,8 @@ gem 'berkshelf'
 ```
 
 then execute `kitchen list` and `kitchen converge`
+
+
+# Building an image
+
+Execute the ```./setup.sh``` script to build your image.
