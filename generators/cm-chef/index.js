@@ -21,7 +21,6 @@ const FILELIST = [
   'chefignore',
   'Gemfile',
   'metadata.rb',
-  'packer_variables.json',
   'README.md',
   'with_zero.rb',
   'install_cookbooks.sh',

@@ -21,11 +21,11 @@ const AWS_REGIONS = [{
 }, {
   name: 'ap-northeast-1'
 }, {
+  name: 'ap-northeast-2'
+}, {
   name: 'ap-southeast-1'
 }, {
   name: 'ap-southeast-2'
-}, {
-  name: 'ap-northeast-1'
 }, {
   name: 'eu-central-1'
 }, {
